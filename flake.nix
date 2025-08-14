@@ -5,19 +5,31 @@
     nixpkgs.url = "github:nixos/nixpkgs?ref=nixos-unstable";
   };
 
-  outputs = { ... }@inputs: let
-  libExtra = {
-    mkFlakePath = self: path: self + (toString path);
-    resolveDir = import ./resolveDir.nix {inherit inputs; inherit (libExtra) mkFlakePath; };
+  outputs = { self, ... }@inputs:
+  let
+    makeLib = selfArg:
+      let
+        mkFlakePath = path: selfArg + (toString path);
 
-    pkgsConfig = {
-      allowUnfree = true;
-      allowUnfreePredicate = _: true;
-      android_sdk.accept_license = true;
-      permittedInsecurePackages = [
-        "libsoup-2.74.3"
-      ];
-    };
+        libExtra = {
+          inherit mkFlakePath;
+
+          resolveDir = import ./resolveDir.nix {
+            inherit inputs mkFlakePath;
+          };
+
+          pkgsConfig = {
+            allowUnfree = true;
+            allowUnfreePredicate = _: true;
+            android_sdk.accept_license = true;
+            permittedInsecurePackages = [ "libsoup-2.74.3" ];
+          };
+        };
+      in
+        libExtra;
+  in
+  {
+    lib.default = makeLib self;
+    lib.for = makeLib;
   };
-  in libExtra;
 }
