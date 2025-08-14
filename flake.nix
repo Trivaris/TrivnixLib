@@ -7,7 +7,7 @@
 
   outputs = { ... }@inputs: let
   libExtra = {
-    mkFlakePath = path: (inputs.self + (toString path));
+    mkFlakePath = self: path: self + (toString path);
     resolveDir = import ./resolveDir.nix {inherit inputs; inherit (libExtra) mkFlakePath; };
 
     pkgsConfig = {
