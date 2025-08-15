@@ -10,7 +10,7 @@
     makeLib = selfArg:
       let
         mkFlakePath = path: selfArg + (toString path);
-        inherit (nixpkgs.lib) mkOption types;
+        inherit (nixpkgs.lib) mkOption types mkEnableOption;
 
         libExtra = {
           inherit mkFlakePath;
@@ -23,6 +23,8 @@
             mkOption {
               type = types.listOf (types.submodule {
                 options = {
+                  enable = mkEnableOption "Wether to enable to Reverseproxy";
+
                   port = mkOption {
                     type = types.int;
                     default = defaultPort;
@@ -39,6 +41,15 @@
                     type = types.str;
                     example = "service.example.com";
                     description = "Domain for the service.";
+                  };
+
+                  ipAddress = mkOption {
+                    type = types.str;
+                    default = "127.0.0.1";
+                    description = ''
+                      Internal IP address the service binds to.
+                      Use "127.0.0.1" for localhost-only access or "0.0.0.0" to listen on all interfaces.
+                    '';
                   };
                 };
               });
