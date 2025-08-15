@@ -21,7 +21,7 @@
 
           mkReverseProxyOption = { defaultPort }:
             mkOption {
-              type = types.listOf (types.submodule {
+              type = types.submodule {
                 options = {
                   enable = mkEnableOption "Wether to enable to Reverseproxy";
 
@@ -52,7 +52,7 @@
                     '';
                   };
                 };
-              });
+              };
               default = [];
               description = "List of services with name, ports, and domain.";
             };
