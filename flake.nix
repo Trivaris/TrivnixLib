@@ -53,6 +53,13 @@
                   };
                 };
               };
+              default = {
+                enable = false;
+                port = defaultPort;
+                domain = "";
+                externalPort = null;
+                ipAddress = "127.0.0.1";
+              };
               description = "List of services with name, ports, and domain.";
             };
 
