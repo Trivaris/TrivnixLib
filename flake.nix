@@ -31,16 +31,16 @@
                     description = "Internal service port.";
                   };
 
-                  externalPort = mkOption {
-                    type = types.nullOr types.int;
-                    default = null;
-                    description = "Optional external port for the service.";
-                  };
-
                   domain = mkOption {
                     type = types.str;
                     example = "service.example.com";
                     description = "Domain for the service.";
+                  };
+
+                  externalPort = mkOption {
+                    type = types.nullOr types.int;
+                    default = null;
+                    description = "Optional external port for the service.";
                   };
 
                   ipAddress = mkOption {
@@ -53,7 +53,6 @@
                   };
                 };
               };
-              default = [];
               description = "List of services with name, ports, and domain.";
             };
 
