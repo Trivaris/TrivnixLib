@@ -5,11 +5,12 @@
     nixpkgs.url = "github:nixos/nixpkgs?ref=nixos-unstable";
   };
 
-  outputs = { self, ... }@inputs:
+  outputs = { self, nixpkgs, ... }@inputs:
   let
     makeLib = selfArg:
       let
         mkFlakePath = path: selfArg + (toString path);
+        inherit (nixpkgs.lib) mkOption types;
 
         libExtra = {
           inherit mkFlakePath;
@@ -17,6 +18,33 @@
           resolveDir = import ./resolveDir.nix {
             inherit inputs mkFlakePath;
           };
+
+          mkReverseProxyOption = { defaultPort }:
+            mkOption {
+              type = types.listOf (types.submodule {
+                options = {
+                  port = mkOption {
+                    type = types.int;
+                    default = defaultPort;
+                    description = "Internal service port.";
+                  };
+
+                  externalPort = mkOption {
+                    type = types.nullOr types.int;
+                    default = null;
+                    description = "Optional external port for the service.";
+                  };
+
+                  domain = mkOption {
+                    type = types.str;
+                    example = "service.example.com";
+                    description = "Domain for the service.";
+                  };
+                };
+              });
+              default = [];
+              description = "List of services with name, ports, and domain.";
+            };
 
           pkgsConfig = {
             allowUnfree = true;
