@@ -97,6 +97,7 @@ in {
       |> filterEntries
       |> (dropNixExtensions true)
       |> (collectAttrs { pathMode = true; prefix = "${toString flakePath}/"; })
+      |> builtins.filter (path: !(lib.hasSuffix "default.nix" path))
       |> map mkStorePath;
 
     imports = entries:

@@ -10,7 +10,7 @@
 
     makeLib = selfArg: let
       mkStorePath = path: selfArg + (toString "/${path}");
-      mkFlakePath = path: lib.removePrefix (selfArg + (toString "/")) (toString path);
+      mkFlakePath = path: lib.removePrefix (selfArg + "/") (toString path);
 
       trivnixLib = {
         inherit mkStorePath mkFlakePath;
