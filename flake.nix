@@ -19,7 +19,7 @@
           inherit inputs mkFlakePath mkStorePath;
         };
 
-        mkReverseProxyOption = import ./mkReverseProxyOption { inherit (lib) types mkOption mkEnableOption; };
+        mkReverseProxyOption = import ./mkReverseProxyOption.nix { inherit (lib) types mkOption mkEnableOption; };
         
         pkgsConfig = {
           allowUnfree = true;
