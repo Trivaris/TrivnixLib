@@ -29,16 +29,8 @@
         };
       };
     in trivnixLib;
-
-    trivnixLib = makeLib self;
   in {
     lib.default = makeLib self;
     lib.for = makeLib;
-    test = trivnixLib.resolveDir {
-      dirPath = ./test;
-      depth = 3;
-      mode = "imports";
-      includeNonNix = true;
-    };
   };
 }
