@@ -119,6 +119,7 @@ in {
     importList = [ 
       operations.foldDefault
       operations.onlyNixFiles
+      ( lib.filterAttrs (name: _: name != "default.nix") )
       operations.collapse
       builtins.attrValues
       ( map (path: dirPath + "/${path}") )
@@ -126,6 +127,7 @@ in {
     moduleNames = [
       operations.foldDefault
       operations.onlyNixFiles
+      ( lib.filterAttrs (name: _: name != "default.nix") )
       operations.stripNixSuffix
       operations.collapse
       builtins.attrNames
