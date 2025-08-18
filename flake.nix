@@ -16,7 +16,7 @@
         inherit mkStorePath mkFlakePath;
 
         resolveDir = import ./resolveDir.nix {
-          inherit inputs mkFlakePath mkStorePath;
+          inherit inputs;
         };
 
         mkReverseProxyOption = import ./mkReverseProxyOption.nix { inherit (lib) types mkOption mkEnableOption; };
@@ -29,8 +29,15 @@
         };
       };
     in trivnixLib;
+
+    trivnixLib = makeLib self;
   in {
     lib.default = makeLib self;
     lib.for = makeLib;
+
+    tests = {
+      imports = trivnixLib.resolveDir { dirPath = ./test/imports; preset = "importList"; };
+      modules = trivnixLib.resolveDir { dirPath = ./test/modules; preset = "moduleNames"; };
+    };
   };
 }

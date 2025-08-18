@@ -1,118 +1,141 @@
-{ inputs, mkFlakePath, mkStorePath }: let
+{ inputs }: let
   inherit (inputs.nixpkgs) lib;
 in {
   dirPath,
-  mode,
-  dropNixExtension ? false,
   exclude ? [ ],
-  depth ? 1,
-  includeNonNix? false
+  preset ? null,
+  flags ? [ ],
+  depth ? null,
 }: let
-  inherit (lib) mapAttrs' nameValuePair;
-
+  mkStorePath = path: "${dirPath}/${path}";
   nixSuffix = ".nix";
-  flakePath = mkFlakePath dirPath;
-
-  filterEntries = entries: lib.filterAttrs (name: type: includeNonNix || lib.hasSuffix nixSuffix name || type == "directory") entries;
-  
-  dropNixExtensions = recursive: entries:
-    mapAttrs' (name: value:
-      nameValuePair
-        (if dropNixExtension && (lib.hasSuffix nixSuffix name) && !(value == "directory") then lib.removeSuffix nixSuffix name else name)
-        (if recursive && (builtins.isAttrs value) then (dropNixExtensions true value) else value)
-    ) entries;
 
   traverseDir = rel: remainingDepth: let
     entries =
-      if remainingDepth > 0 then
-        builtins.readDir (mkFlakePath "${dirPath}/${rel}")
+      if (remainingDepth == null || remainingDepth > 0) then
+        builtins.readDir "${dirPath}/${rel}"
         |> (entries: removeAttrs entries exclude)
       else { };
-  in mapAttrs' (name: type:
-    nameValuePair name (
-      if type == "directory" then
-        if mode == "importList" && builtins.pathExists (mkFlakePath "${dirPath}/${rel}/${name}/default.nix")
-        then name else traverseDir "${rel}/${name}" (remainingDepth - 1)
-      else type
+    nextDepth = if remainingDepth == null then null else remainingDepth - 1;
+  in lib.mapAttrs' (name: type:
+    lib.nameValuePair name (
+      if type == "directory"
+      then traverseDir "${rel}/${name}" nextDepth
+      else "${dirPath}/${rel}/${name}"
     )
   ) entries;
 
-  collectAttrs = {
-    pathMode ? false,
-    prefix ? "",
-    separator ? "/",
-    includeSets ? false,
-    asSet ? false
-  }: inputSet: let
-    formatName = path:
-      if pathMode then lib.concatStringsSep separator path else lib.last path;
+  collapseAttrs = attrs:
+    attrs
+    |> (lib.mapAttrsRecursiveCond
+          (value: builtins.isAttrs value)
+          (path: value: { inherit path value; }))
+    |> (lib.collect (x:
+          builtins.isAttrs x
+          && builtins.hasAttr "path" x
+          && builtins.hasAttr "value" x))
+    |> (builtins.map ({ path, value }: {
+          name  = builtins.concatStringsSep "/" path;
+          inherit value;
+        }))
+    |> builtins.listToAttrs;
 
-    mkResult = name: value:
-      if asSet then lib.nameValuePair name value else name;
+  mapValuesToPaths = attrs:
+    lib.mapAttrsRecursiveCond (value: builtins.isAttrs value) (path: value:
+      if builtins.isAttrs value
+      then value
+      else builtins.concatStringsSep "/" path
+    ) attrs;
 
-    traverse = path: value:
-      if builtins.isAttrs value then
-        (lib.optional includeSets (mkResult (prefix + formatName path) value))
-        ++ (
-        value
-        |>  lib.mapAttrsToList (childName: childValue: traverse (path ++ [ childName ]) childValue)
-        |>  lib.concatLists )
-      else [ (mkResult (prefix + formatName path) value) ];
+  operations = builtins.listToAttrs rawOperations;
+  rawOperations = [
+    (lib.nameValuePair
+      "foldDefault"
+      (entries:
+        lib.mapAttrs' (name: value:
+          lib.nameValuePair
+            name
+            ( if builtins.isAttrs value then let
+              defName = lib.findFirst
+                (name: builtins.isString value.${name} && lib.hasSuffix "/default.nix" value.${name})
+                null
+                (builtins.attrNames value);
+              in if defName != null then value.${defName} else operations.foldDefault value
+            else value )
+        ) entries
+      )
+    )
 
-    results = 
-    inputSet
-    |>  lib.mapAttrsToList (name: value: traverse [ name ] value)
-    |>  lib.concatLists;
-  in
-    if asSet
-    then lib.listToAttrs results
-    else results;
+    (lib.nameValuePair
+      "stripNixSuffix"
+      (entries:
+        lib.mapAttrs' (name: value:
+          lib.nameValuePair
+            (if lib.isAttrs value then name else lib.removeSuffix nixSuffix name)
+            (if lib.isAttrs value then operations.stripNixSuffix value else value)
+        ) entries
+      )
+    )
 
-  operations = {
-    plain = entries:
-      entries
-      |> filterEntries
-      |> (dropNixExtensions true);
-
-    names = entries:
-      entries
-      |> filterEntries
-      |> (dropNixExtensions true)
-      |> (collectAttrs { });
-
-    paths = entries:
-      entries
-      |> filterEntries
-      |> (dropNixExtensions true)
-      |> (collectAttrs { pathMode = true; });
-
-    fullPaths = entries:
-      entries
-      |> filterEntries
-      |> (dropNixExtensions true)
-      |> (collectAttrs { pathMode = true; prefix = "${flakePath}/"; });
-
-    importList = entries:
-      entries
-      |> filterEntries
-      |> (dropNixExtensions true)
-      |> (collectAttrs { pathMode = true; prefix = "${toString flakePath}/"; })
-      |> builtins.filter (path: !(lib.hasSuffix "default.nix" path))
-      |> map mkStorePath;
-
-    imports = entries:
-      entries
-      |> collectAttrs { pathMode = true; prefix = "${toString flakePath}/"; }
-      |> map
-        (path:
-          nameValuePair
-            (baseNameOf path) 
-            ( if lib.hasSuffix nixSuffix path
-              then (import (mkStorePath path))
-              else (builtins.readFile (mkStorePath path)))
+    (lib.nameValuePair
+      "onlyNixFiles"
+      (entries:
+        entries |> 
+        lib.mapAttrs' (name: value:
+          lib.nameValuePair
+            name
+            (if builtins.isAttrs value then operations.onlyNixFiles value else value)
+        ) |> 
+        lib.filterAttrs(_: value:
+          if builtins.isAttrs value then value != { } else builtins.isString value && lib.hasSuffix nixSuffix value
         )
-      |> builtins.listToAttrs
-      |> filterEntries
-      |> (dropNixExtensions true);
+      )
+    )
+
+    (lib.nameValuePair
+      "collapse" 
+      (entries: collapseAttrs entries)
+    )
+
+    (lib.nameValuePair
+      "mapImports"
+      (entries:
+        lib.mapAttrs' (name: value:
+          lib.nameValuePair
+            name
+            (if lib.isAttrs value then operations.mapImports value else if lib.hasSuffix nixSuffix value then import (mkStorePath value) else builtins.readFile (mkStorePath value))
+        ) entries
+      )
+    )
+  ];
+
+  orderedOperations =
+    rawOperations
+    |> map (operation: operation.name)
+    |> lib.filter (operation: lib.elem operation flags)
+    |> map (operation: operations.${operation});
+
+  presets = {
+    importList = [ 
+      operations.foldDefault
+      operations.onlyNixFiles
+      operations.collapse
+      builtins.attrValues
+      ( map (path: dirPath + "/${path}") )
+    ];
+    moduleNames = [
+      operations.foldDefault
+      operations.onlyNixFiles
+      operations.stripNixSuffix
+      operations.collapse
+      builtins.attrNames
+    ];
   };
-in operations.${mode} (traverseDir "" depth)
+
+  finalOperations = if preset != null then
+    lib.warnIf (flags != [ ])
+      "Both `preset` and `flags` are set; using preset and ignoring flags"
+      presets.${preset}
+  else orderedOperations;
+
+in lib.pipe (traverseDir "" depth |> mapValuesToPaths) finalOperations 
