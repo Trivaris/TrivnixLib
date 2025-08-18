@@ -12,8 +12,14 @@
       mkStorePath = path: selfArg + (toString "/${path}");
       mkFlakePath = path: lib.removePrefix (selfArg + "/") (toString path);
 
+      recursiveAttrValues = attrs:
+        attrs
+        |> builtins.attrValues
+        |> map (value: if lib.isAttrs value then recursiveAttrValues value else [ value ] )
+        |> builtins.concatLists;
+
       trivnixLib = {
-        inherit mkStorePath mkFlakePath;
+        inherit mkStorePath mkFlakePath recursiveAttrValues;
 
         resolveDir = import ./resolveDir.nix {
           inherit inputs;
