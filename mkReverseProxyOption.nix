@@ -1,4 +1,8 @@
-{ mkOption, types, mkEnableOption }:
+{
+  mkOption,
+  types,
+  mkEnableOption,
+}:
 { defaultPort }:
 mkOption {
   type = types.submodule {
