@@ -139,6 +139,13 @@ let
       operations.collapse
       builtins.attrNames
     ];
+    namePathMap = [
+      operations.foldDefault
+      operations.onlyNixFiles
+      (lib.filterAttrs (name: _: name != "default.nix"))
+      operations.stripNixSuffix
+      operations.collapse
+    ];
   };
 
   finalOperations =
