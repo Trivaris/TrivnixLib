@@ -1,3 +1,4 @@
+selfArg:
 {
   inputs,
   outputs,
@@ -19,8 +20,8 @@ let
   hostPubKeys = hostConfig.pubKeys;
   userConfig = hostConfig.users.${username};
   userPrefs = userConfig.prefs;
-  allOtherHostConfigs = builtins.removeAttrs configs [ configname ];
-  allOtherUserConfigs = builtins.removeAttrs hostConfig.users [ username ];
+  allOtherHostConfigs = removeAttrs configs [ configname ];
+  allOtherUserConfigs = removeAttrs hostConfig.users [ username ];
   allHostInfos = mapAttrs' (name: value: nameValuePair name value.infos) allOtherHostConfigs;
   allHostPrefs = mapAttrs' (name: value: nameValuePair name value.prefs) allOtherHostConfigs;
   allHostPubKeys = mapAttrs' (name: value: nameValuePair name value.pubKeys) allOtherHostConfigs;
@@ -99,7 +100,7 @@ homeManagerConfiguration {
       config = { inherit userPrefs; };
 
       imports = trivnixLib.resolveDir {
-        dirPath = ./home;
+        dirPath = selfArg + "/home";
         preset = "importList";
       };
     }

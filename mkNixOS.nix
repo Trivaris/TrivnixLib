@@ -1,3 +1,4 @@
+selfArg:
 {
   inputs,
   outputs,
@@ -88,7 +89,7 @@ nixosSystem {
 
     {
       imports = trivnixLib.resolveDir {
-        dirPath = ./host;
+        dirPath = selfArg + "/host";
         preset = "importList";
       };
 
@@ -117,7 +118,7 @@ nixosSystem {
             nameValuePair name {
               imports =
                 trivnixLib.resolveDir {
-                  dirPath = ./home;
+                  dirPath = selfArg + "/home";
                   preset = "importList";
                 }
                 ++ [
