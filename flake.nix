@@ -25,6 +25,8 @@
 
           trivnixLib = {
             inherit mkStorePath mkFlakePath recursiveAttrValues;
+            mkHomeManager = import ./mkHomeManager.nix;
+            mkNixOS = import ./mkNixOS.nix;
 
             resolveDir = import ./resolveDir.nix {
               inherit inputs;
