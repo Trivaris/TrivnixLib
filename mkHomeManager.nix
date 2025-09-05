@@ -1,11 +1,9 @@
 selfArg:
 {
   inputs,
-  outputs,
+  overlays,
   trivnixLib,
-  commonInfos,
-  configs,
-  inputOverlays,
+  trivnixConfigs,
 }:
 {
   configname,
@@ -14,6 +12,7 @@ selfArg:
 let
   inherit (inputs.nixpkgs.lib) mapAttrs' nameValuePair;
   inherit (inputs.home-manager.lib) homeManagerConfiguration;
+  inherit (trivnixConfigs) configs commonInfos;
 
   hostConfig = configs.${configname};
   hostPrefs = hostConfig.prefs;
@@ -53,7 +52,6 @@ let
   generalArgs = {
     inherit
       inputs
-      outputs
       trivnixLib
       commonInfos
       allHostInfos
@@ -85,7 +83,7 @@ homeManagerConfiguration {
 
   pkgs = import inputs.nixpkgs {
     system = hostConfig.infos.architecture;
-    overlays = builtins.attrValues (inputOverlays // outputs.overlays);
+    overlays = builtins.attrValues overlays;
     config = hostConfig.pkgsConfig;
   };
 

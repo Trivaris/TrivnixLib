@@ -42,8 +42,10 @@
       trivnixLib = makeLib self;
     in
     {
-      lib.default = makeLib self;
-      lib.for = makeLib;
+      lib = {
+        default = makeLib self;
+        for = makeLib;
+      };
 
       tests = {
         imports = trivnixLib.resolveDir {
