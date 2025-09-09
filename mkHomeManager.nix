@@ -15,10 +15,10 @@ let
   inherit (trivnixConfigs) configs commonInfos;
 
   hostConfig = configs.${configname};
-  hostPrefs = hostConfig.prefs;
+  hostPrefs = hostConfig.prefs // { stylix = null; };
   hostPubKeys = hostConfig.pubKeys;
   userConfig = hostConfig.users.${username};
-  userPrefs = userConfig.prefs // { stylix = hostPrefs.stylix; };
+  userPrefs = userConfig.prefs // { stylix = hostConfig.prefs.stylix; };
   allOtherHostConfigs = removeAttrs configs [ configname ];
   allOtherUserConfigs = removeAttrs hostConfig.users [ username ];
   allHostInfos = mapAttrs' (name: value: nameValuePair name value.infos) allOtherHostConfigs;

@@ -69,7 +69,7 @@ let
 in
 nixosSystem {
   inherit pkgs;
-  specialArgs = generalArgs // hostArgs // { isNixos = true; };
+  specialArgs = generalArgs // hostArgs;
 
   modules = [
     # Flake NixOS entrypoint
@@ -102,7 +102,7 @@ nixosSystem {
             inputs.nvf.homeManagerModules.default
           ];
 
-          extraSpecialArgs = generalArgs // hostArgs // { inherit hostPrefs pkgs; };
+          extraSpecialArgs = generalArgs // hostArgs // { inherit hostPrefs pkgs; isNixos = false; };
           useUserPackages = true;
 
           users = mapAttrs' (
