@@ -69,7 +69,7 @@ let
 in
 nixosSystem {
   inherit pkgs;
-  specialArgs = generalArgs // hostArgs;
+  specialArgs = generalArgs // hostArgs // { isNixos = true; };
 
   modules = [
     # Flake NixOS entrypoint

@@ -81,7 +81,7 @@ let
 in
 homeManagerConfiguration {
   inherit pkgs;
-  extraSpecialArgs = generalArgs // hostArgs // homeArgs;
+  extraSpecialArgs = generalArgs // hostArgs // homeArgs // { isNixos = false; };
 
   modules = [
     # Flake entrypoint
