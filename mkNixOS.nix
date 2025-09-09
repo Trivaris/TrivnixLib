@@ -102,7 +102,7 @@ nixosSystem {
             inputs.nvf.homeManagerModules.default
           ];
 
-          extraSpecialArgs = generalArgs // hostArgs // { inherit hostPrefs pkgs; isNixos = false; };
+          extraSpecialArgs = generalArgs // hostArgs // { inherit hostPrefs pkgs; isNixos = true; };
           useUserPackages = true;
 
           users = mapAttrs' (
