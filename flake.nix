@@ -16,6 +16,16 @@
           mkStorePath = path: selfArg + (toString "/${path}");
           mkFlakePath = path: lib.removePrefix (selfArg + "/") (toString path);
 
+          getColor =
+            { scheme, pkgs }:
+            name:
+            builtins.readFile (
+              pkgs.runCommand "color-${name}" {
+                inherit scheme;
+                nativeBuildInputs = [ pkgs.yq ];
+              } "yq -r '.palette.${name}' \"${scheme}\" > $out"
+            );
+
           recursiveAttrValues =
             attrs:
             attrs
@@ -24,7 +34,12 @@
             |> builtins.concatLists;
 
           trivnixLib = {
-            inherit mkStorePath mkFlakePath recursiveAttrValues;
+            inherit
+              mkStorePath
+              mkFlakePath
+              recursiveAttrValues
+              getColor
+              ;
             mkHomeManager = import ./mkHomeManager.nix selfArg;
             mkNixOS = import ./mkNixOS.nix selfArg;
 

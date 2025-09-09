@@ -26,6 +26,7 @@ let
   allHostPubKeys = mapAttrs' (name: value: nameValuePair name value.pubKeys) allOtherHostConfigs;
   allUserPrefs = mapAttrs' (name: value: nameValuePair name value.prefs) allOtherUserConfigs;
   allUserInfos = mapAttrs' (name: value: nameValuePair name value.prefs) allOtherUserConfigs;
+  homeArgs.userInfos = userInfos;
 
   hostInfos = hostConfig.infos // {
     inherit configname;
@@ -72,20 +73,15 @@ let
       ;
   };
 
-  homeArgs = {
-    inherit
-      userInfos
-      ;
-  };
-in
-homeManagerConfiguration {
-  extraSpecialArgs = generalArgs // hostArgs // homeArgs;
-
   pkgs = import inputs.nixpkgs {
     system = hostConfig.infos.architecture;
     overlays = builtins.attrValues overlays;
     config = hostConfig.pkgsConfig;
   };
+in
+homeManagerConfiguration {
+  inherit pkgs;
+  extraSpecialArgs = generalArgs // hostArgs // homeArgs;
 
   modules = [
     # Flake entrypoint
