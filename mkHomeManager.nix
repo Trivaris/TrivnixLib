@@ -18,7 +18,7 @@ let
   hostPrefs = hostConfig.prefs;
   hostPubKeys = hostConfig.pubKeys;
   userConfig = hostConfig.users.${username};
-  userPrefs = userConfig.prefs;
+  userPrefs = userConfig.prefs // { stylix = hostPrefs.stylix; };
   allOtherHostConfigs = removeAttrs configs [ configname ];
   allOtherUserConfigs = removeAttrs hostConfig.users [ username ];
   allHostInfos = mapAttrs' (name: value: nameValuePair name value.infos) allOtherHostConfigs;
