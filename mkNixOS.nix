@@ -5,7 +5,11 @@ selfArg:
   trivnixLib,
   trivnixConfigs,
 }:
-configname:
+{
+  configname,
+  hostModules,
+  homeModules,
+}:
 let
   inherit (inputs.nixpkgs.lib) mapAttrs' nameValuePair nixosSystem;
   inherit (trivnixConfigs) configs commonInfos;
@@ -67,20 +71,13 @@ let
     config = hostConfig.pkgsConfig;
   };
 in
+assert builtins.hasAttr configname configs;
 nixosSystem {
   inherit pkgs;
   specialArgs = generalArgs // hostArgs;
 
-  modules = [
+  modules = hostModules ++ [
     # Flake NixOS entrypoint
-    inputs.disko.nixosModules.disko
-    inputs.home-manager.nixosModules.home-manager
-    inputs.sops-nix.nixosModules.sops
-    inputs.nur.modules.nixos.default
-    inputs.stylix.nixosModules.stylix
-    inputs.nix-minecraft.nixosModules.minecraft-servers
-    inputs.spicetify-nix.nixosModules.spicetify
-    inputs.nvf.nixosModules.default
     hostConfig.partitions
     hostConfig.hardware
 
@@ -96,13 +93,15 @@ nixosSystem {
         disko.enableConfig = true;
 
         home-manager = {
-          sharedModules = [
-            inputs.sops-nix.homeManagerModules.sops
-            inputs.spicetify-nix.homeManagerModules.spicetify
-            inputs.nvf.homeManagerModules.default
-          ];
+          sharedModules = homeModules;
 
-          extraSpecialArgs = generalArgs // hostArgs // { inherit hostPrefs pkgs; isNixos = true; };
+          extraSpecialArgs =
+            generalArgs
+            // hostArgs
+            // {
+              inherit hostPrefs pkgs;
+              isNixos = true;
+            };
           useUserPackages = true;
 
           users = mapAttrs' (
@@ -121,7 +120,6 @@ nixosSystem {
                 ++ [
                   { _module.args = { inherit userInfos; }; }
                 ];
-
               config = { inherit userPrefs; };
             }
           ) allUserPrefs;

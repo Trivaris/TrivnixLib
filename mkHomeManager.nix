@@ -8,6 +8,7 @@ selfArg:
 {
   configname,
   username,
+  homeModules,
 }:
 let
   inherit (inputs.nixpkgs.lib) mapAttrs' nameValuePair;
@@ -15,18 +16,26 @@ let
   inherit (trivnixConfigs) configs commonInfos;
 
   hostConfig = configs.${configname};
-  hostPrefs = hostConfig.prefs // { stylix = null; };
+  hostPrefs = hostConfig.prefs // {
+    stylix = null;
+  };
   hostPubKeys = hostConfig.pubKeys;
   userConfig = hostConfig.users.${username};
-  userPrefs = userConfig.prefs // { stylix = hostConfig.prefs.stylix; };
+  userPrefs = userConfig.prefs // {
+    stylix = hostConfig.prefs.stylix;
+  };
   allOtherHostConfigs = removeAttrs configs [ configname ];
   allOtherUserConfigs = removeAttrs hostConfig.users [ username ];
   allHostInfos = mapAttrs' (name: value: nameValuePair name value.infos) allOtherHostConfigs;
   allHostPrefs = mapAttrs' (name: value: nameValuePair name value.prefs) allOtherHostConfigs;
   allHostPubKeys = mapAttrs' (name: value: nameValuePair name value.pubKeys) allOtherHostConfigs;
   allUserPrefs = mapAttrs' (name: value: nameValuePair name value.prefs) allOtherUserConfigs;
-  allUserInfos = mapAttrs' (name: value: nameValuePair name value.prefs) allOtherUserConfigs;
-  homeArgs.userInfos = userInfos;
+  allUserInfos = mapAttrs' (name: value: nameValuePair name value.infos) allOtherUserConfigs;
+
+  # Extra args specific to home configs
+  homeArgs = {
+    userInfos = userInfos;
+  };
 
   hostInfos = hostConfig.infos // {
     inherit configname;
@@ -79,20 +88,16 @@ let
     config = hostConfig.pkgsConfig;
   };
 in
+assert builtins.hasAttr configname configs;
+assert builtins.hasAttr username hostConfig.users;
 homeManagerConfiguration {
   inherit pkgs;
   extraSpecialArgs = generalArgs // hostArgs // homeArgs // { isNixos = false; };
 
-  modules = [
+  modules = homeModules ++ [
     # Flake entrypoint
-    inputs.stylix.homeModules.stylix
-    inputs.sops-nix.homeManagerModules.sops
-    inputs.spicetify-nix.homeManagerModules.spicetify
-    inputs.nvf.homeManagerModules.default
-
     {
       config = { inherit userPrefs; };
-
       imports = trivnixLib.resolveDir {
         dirPath = selfArg + "/home";
         preset = "importList";
