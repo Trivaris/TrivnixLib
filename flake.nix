@@ -19,12 +19,12 @@
           getColor =
             { scheme, pkgs }:
             name:
-            builtins.readFile (
-              pkgs.runCommand "color-${name}" {
-                inherit scheme;
-                nativeBuildInputs = [ pkgs.yq ];
-              } "yq -r '.palette.${name}' \"${scheme}\" > $out"
-            );
+            (pkgs.runCommand "color-${name}" {
+              inherit scheme;
+              nativeBuildInputs = [ pkgs.yq ];
+            } "yq -r '.palette.${name}' \"${scheme}\" > $out")
+            |> builtins.readFile
+            |> builtins.replaceStrings [ "\n" ] [ "" ];
 
           recursiveAttrValues =
             attrs:
