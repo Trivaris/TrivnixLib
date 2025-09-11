@@ -9,7 +9,6 @@
     { self, nixpkgs, ... }@inputs:
     let
       inherit (nixpkgs) lib;
-
       makeLib =
         selfArg:
         let
@@ -19,19 +18,23 @@
           getColor =
             { scheme, pkgs }:
             name:
-            (pkgs.runCommand "color-${name}" {
-              inherit scheme;
-              nativeBuildInputs = [ pkgs.yq ];
-            } "yq -r '.palette.${name}' \"${scheme}\" > $out")
-            |> builtins.readFile
-            |> builtins.replaceStrings [ "\n" ] [ "" ];
+            lib.pipe
+              (pkgs.runCommand "color-${name}" {
+                inherit scheme;
+                nativeBuildInputs = [ pkgs.yq ];
+              } "yq -r '.palette.${name}' \"${scheme}\" > $out")
+              [
+                builtins.readFile
+                (builtins.replaceStrings [ "\n" ] [ "" ])
+              ];
 
           recursiveAttrValues =
             attrs:
-            attrs
-            |> builtins.attrValues
-            |> map (value: if lib.isAttrs value then recursiveAttrValues value else [ value ])
-            |> builtins.concatLists;
+            lib.pipe attrs [
+              builtins.attrValues
+              (map (value: if lib.isAttrs value then recursiveAttrValues value else [ value ]))
+              builtins.concatLists
+            ];
 
           trivnixLib = {
             inherit
@@ -40,6 +43,7 @@
               recursiveAttrValues
               getColor
               ;
+
             mkHomeManager = import ./mkHomeManager.nix selfArg;
             mkNixOS = import ./mkNixOS.nix selfArg;
 
@@ -53,24 +57,11 @@
           };
         in
         trivnixLib;
-
-      trivnixLib = makeLib self;
     in
     {
       lib = {
         default = makeLib self;
         for = makeLib;
-      };
-
-      tests = {
-        imports = trivnixLib.resolveDir {
-          dirPath = ./test/imports;
-          preset = "importList";
-        };
-        modules = trivnixLib.resolveDir {
-          dirPath = ./test/modules;
-          preset = "moduleNames";
-        };
       };
     };
 }
