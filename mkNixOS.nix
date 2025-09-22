@@ -16,11 +16,9 @@ let
 
   hostConfig = configs.${configname};
   hostPrefs = hostConfig.prefs;
-  hostPubKeys = hostConfig.pubKeys;
   allOtherHostConfigs = removeAttrs configs [ configname ];
   allHostInfos = mapAttrs' (name: value: nameValuePair name value.infos) allOtherHostConfigs;
   allHostPrefs = mapAttrs' (name: value: nameValuePair name value.prefs) allOtherHostConfigs;
-  allHostPubKeys = mapAttrs' (name: value: nameValuePair name value.pubKeys) allOtherHostConfigs;
   allUserPrefs = mapAttrs' (name: value: nameValuePair name value.prefs) hostConfig.users;
   allUserInfos = mapAttrs' (name: value: nameValuePair name value.infos) hostConfig.users;
 
@@ -49,7 +47,6 @@ let
       commonInfos
       allHostInfos
       allHostPrefs
-      allHostPubKeys
       allHostUserPrefs
       allHostUserInfos
       ;
@@ -59,7 +56,6 @@ let
   hostArgs = {
     inherit
       hostInfos
-      hostPubKeys
       allUserPrefs
       allUserInfos
       ;

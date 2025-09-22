@@ -19,7 +19,6 @@ let
   hostPrefs = hostConfig.prefs // {
     stylix = null;
   };
-  hostPubKeys = hostConfig.pubKeys;
   userConfig = hostConfig.users.${username};
   userPrefs = userConfig.prefs // {
     stylix = hostConfig.prefs.stylix;
@@ -28,7 +27,6 @@ let
   allOtherUserConfigs = removeAttrs hostConfig.users [ username ];
   allHostInfos = mapAttrs' (name: value: nameValuePair name value.infos) allOtherHostConfigs;
   allHostPrefs = mapAttrs' (name: value: nameValuePair name value.prefs) allOtherHostConfigs;
-  allHostPubKeys = mapAttrs' (name: value: nameValuePair name value.pubKeys) allOtherHostConfigs;
   allUserPrefs = mapAttrs' (name: value: nameValuePair name value.prefs) allOtherUserConfigs;
   allUserInfos = mapAttrs' (name: value: nameValuePair name value.infos) allOtherUserConfigs;
 
@@ -66,7 +64,6 @@ let
       commonInfos
       allHostInfos
       allHostPrefs
-      allHostPubKeys
       allHostUserPrefs
       allHostUserInfos
       ;
@@ -76,7 +73,6 @@ let
     inherit
       hostInfos
       hostPrefs
-      hostPubKeys
       allUserPrefs
       allUserInfos
       ;
