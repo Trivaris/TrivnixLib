@@ -54,11 +54,7 @@ let
   };
 
   hostArgs = {
-    inherit
-      hostInfos
-      allUserPrefs
-      allUserInfos
-      ;
+    inherit hostInfos allUserPrefs allUserInfos;
   };
 
   pkgs = import inputs.nixpkgs {
@@ -72,56 +68,52 @@ nixosSystem {
   inherit pkgs;
   specialArgs = generalArgs // hostArgs;
 
-  modules = hostModules ++ [
-    # Flake NixOS entrypoint
-    hostConfig.partitions
-    hostConfig.hardware
+  modules =
+    hostModules
+    ++ (trivnixLib.resolveDir {
+      dirPath = selfArg + "/host";
+      preset = "importList";
+    })
+    ++ [
+      hostConfig.partitions
+      hostConfig.hardware
 
-    {
-      imports = trivnixLib.resolveDir {
-        dirPath = selfArg + "/host";
-        preset = "importList";
-      };
+      {
+        config = {
+          inherit hostPrefs;
+          disko.enableConfig = true;
 
-      # Expose flake args, also within the home-manager config
-      config = {
-        inherit hostPrefs;
-        disko.enableConfig = true;
+          home-manager = {
+            useUserPackages = true;
+            useGlobalPkgs = true;
+            extraSpecialArgs = generalArgs // hostArgs // { isNixos = true; };
 
-        home-manager = {
-          sharedModules = homeModules;
+            backupFileExtension = builtins.readFile (
+              pkgs.runCommandNoCC "timestamp" { } "echo -n $(date '+%d-%m-%Y-%H-%M-%S')-backup > $out"
+            );
 
-          extraSpecialArgs =
-            generalArgs
-            // hostArgs
-            // {
-              inherit hostPrefs pkgs;
-              isNixos = true;
-            };
-          useUserPackages = true;
+            sharedModules =
+              homeModules
+              ++ (trivnixLib.resolveDir {
+                dirPath = selfArg + "/home";
+                preset = "importList";
+              });
 
-          users = mapAttrs' (
-            name: userPrefs:
-            let
-              userInfos = hostConfig.users.${name}.infos // {
-                inherit name;
-              };
-            in
-            nameValuePair name {
-              imports =
-                trivnixLib.resolveDir {
-                  dirPath = selfArg + "/home";
-                  preset = "importList";
-                }
-                ++ [
-                  { _module.args = { inherit userInfos; }; }
-                ];
-              config = { inherit userPrefs; };
-            }
-          ) allUserPrefs;
+            users = mapAttrs' (
+              name: userPrefs:
+              let
+                userInfos = hostConfig.users.${name}.infos // {
+                  inherit name;
+                };
+              in
+              nameValuePair name {
+                config = { inherit userPrefs; };
+                imports = [ { _module.args = { inherit userInfos; }; } ];
+              }
+            ) allUserPrefs;
+          };
         };
-      };
-    }
-  ];
+      }
+    ];
 
 }

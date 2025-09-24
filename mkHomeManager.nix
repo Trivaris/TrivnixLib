@@ -90,14 +90,11 @@ homeManagerConfiguration {
   inherit pkgs;
   extraSpecialArgs = generalArgs // hostArgs // homeArgs // { isNixos = false; };
 
-  modules = homeModules ++ [
-    # Flake entrypoint
-    {
-      config = { inherit userPrefs; };
-      imports = trivnixLib.resolveDir {
-        dirPath = selfArg + "/home";
-        preset = "importList";
-      };
-    }
-  ];
+  modules =
+    homeModules
+    ++ [ { config = { inherit userPrefs; }; } ]
+    ++ (trivnixLib.resolveDir {
+      dirPath = selfArg + "/home";
+      preset = "importList";
+    });
 }

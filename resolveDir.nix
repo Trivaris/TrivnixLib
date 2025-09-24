@@ -11,6 +11,7 @@ let
     removeSuffix
     filterAttrs
     warnIf
+    optionalAttrs
     ;
 in
 {
@@ -27,11 +28,9 @@ let
   traverseDir =
     rel: remainingDepth:
     let
-      entries =
-        if (remainingDepth == null || remainingDepth > 0) then
-          pipe (builtins.readDir "${dirPath}/${rel}") [ (entries: removeAttrs entries exclude) ]
-        else
-          { };
+      entries = optionalAttrs (remainingDepth == null || remainingDepth > 0) (
+        pipe (builtins.readDir "${dirPath}/${rel}") [ (entries: removeAttrs entries exclude) ]
+      );
       nextDepth = if remainingDepth == null then null else remainingDepth - 1;
     in
     mapAttrs' (
