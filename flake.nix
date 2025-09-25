@@ -28,6 +28,25 @@
                 (builtins.replaceStrings [ "\n" ] [ "" ])
               ];
 
+          mkSimpleModuleConfig =
+            { simpleModules, pkgs }:
+            let
+              inherit (pkgs.lib) mkMerge mapAttrs;
+            in
+            mkMerge (
+              mapAttrs (
+                optionName: config:
+                let
+                  isProgram = config.isProgram or false;
+                  packageName = config.packageName or optionName;
+                in
+                if isProgram then
+                  { programs.${packageName}.enable = true; }
+                else
+                  { home.packages = [ pkgs.${packageName} ]; }
+              ) simpleModules
+            );
+
           recursiveAttrValues =
             attrs:
             lib.pipe attrs [
@@ -41,6 +60,7 @@
               mkStorePath
               mkFlakePath
               recursiveAttrValues
+              mkSimpleModuleConfig
               getColor
               ;
 
