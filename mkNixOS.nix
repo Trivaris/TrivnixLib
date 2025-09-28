@@ -2,7 +2,6 @@ selfArg:
 {
   inputs,
   overlays,
-  trivnixLib,
   trivnixConfigs,
 }:
 {
@@ -11,13 +10,10 @@ selfArg:
   homeModules,
 }:
 let
-  inherit (inputs.nixpkgs.lib)
-    mapAttrs'
-    nameValuePair
-    nixosSystem
-    optionalAttrs
-    ;
+  inherit (inputs.nixpkgs.lib) mapAttrs' nameValuePair nixosSystem;
   inherit (trivnixConfigs) configs commonInfos;
+
+  trivnixLib = inputs.trivnixLib.lib.for { inherit selfArg pkgs; };
 
   hostConfig = configs.${configname};
   hostPrefs = hostConfig.prefs;
@@ -55,7 +51,6 @@ let
       allHostUserPrefs
       allHostUserInfos
       ;
-
   };
 
   hostArgs = {
@@ -68,15 +63,13 @@ let
     config = hostConfig.pkgsConfig;
   };
 in
+assert inputs ? trivnixLib;
 assert builtins.hasAttr configname configs;
 nixosSystem {
   inherit pkgs;
   specialArgs =
     generalArgs
-    // hostArgs
-    // (optionalAttrs (inputs ? trivnixLib) {
-      trivnixLib = inputs.trivnixLib.lib.for { inherit selfArg pkgs; };
-    });
+    // hostArgs;
 
   modules =
     hostModules
