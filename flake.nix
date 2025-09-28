@@ -1,23 +1,23 @@
 {
   description = "Trivnix Helpers and Utilities";
 
-  inputs = {
-    nixpkgs.url = "github:nixos/nixpkgs?ref=nixos-unstable";
-  };
+  inputs.nixpkgs.url = "github:nixos/nixpkgs?ref=nixos-unstable";
 
   outputs =
     { self, nixpkgs, ... }@inputs:
     let
       inherit (nixpkgs) lib;
       makeLib =
-        selfArg:
+        {
+          selfArg,
+          pkgs ? null,
+        }:
         let
           mkStorePath = path: selfArg + (toString "/${path}");
           mkFlakePath = path: lib.removePrefix (selfArg + "/") (toString path);
 
           getColor =
-            { scheme, pkgs }:
-            name:
+            scheme: name:
             lib.pipe
               (pkgs.runCommand "color-${name}" {
                 inherit scheme;
@@ -27,25 +27,6 @@
                 builtins.readFile
                 (builtins.replaceStrings [ "\n" ] [ "" ])
               ];
-
-          mkSimpleModuleConfig =
-            { simpleModules, pkgs }:
-            let
-              inherit (pkgs.lib) mkMerge mapAttrs;
-            in
-            mkMerge (
-              mapAttrs (
-                optionName: config:
-                let
-                  isProgram = config.isProgram or false;
-                  packageName = config.packageName or optionName;
-                in
-                if isProgram then
-                  { programs.${packageName}.enable = true; }
-                else
-                  { home.packages = [ pkgs.${packageName} ]; }
-              ) simpleModules
-            );
 
           recursiveAttrValues =
             attrs:
@@ -60,7 +41,6 @@
               mkStorePath
               mkFlakePath
               recursiveAttrValues
-              mkSimpleModuleConfig
               getColor
               ;
 

@@ -11,7 +11,7 @@ selfArg:
   homeModules,
 }:
 let
-  inherit (inputs.nixpkgs.lib) mapAttrs' nameValuePair;
+  inherit (inputs.nixpkgs.lib) mapAttrs' nameValuePair optionalAttrs;
   inherit (inputs.home-manager.lib) homeManagerConfiguration;
   inherit (trivnixConfigs) configs commonInfos;
 
@@ -88,7 +88,16 @@ assert builtins.hasAttr configname configs;
 assert builtins.hasAttr username hostConfig.users;
 homeManagerConfiguration {
   inherit pkgs;
-  extraSpecialArgs = generalArgs // hostArgs // homeArgs // { isNixos = false; };
+  extraSpecialArgs =
+    generalArgs
+    // hostArgs
+    // homeArgs
+    // {
+      isNixos = false;
+    }
+    // (optionalAttrs (inputs ? trivnixLib) {
+      trivnixLib = inputs.trivnixLib.lib.for { inherit selfArg pkgs; };
+    });
 
   modules =
     homeModules

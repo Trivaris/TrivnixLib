@@ -11,7 +11,12 @@ selfArg:
   homeModules,
 }:
 let
-  inherit (inputs.nixpkgs.lib) mapAttrs' nameValuePair nixosSystem;
+  inherit (inputs.nixpkgs.lib)
+    mapAttrs'
+    nameValuePair
+    nixosSystem
+    optionalAttrs
+    ;
   inherit (trivnixConfigs) configs commonInfos;
 
   hostConfig = configs.${configname};
@@ -66,7 +71,12 @@ in
 assert builtins.hasAttr configname configs;
 nixosSystem {
   inherit pkgs;
-  specialArgs = generalArgs // hostArgs;
+  specialArgs =
+    generalArgs
+    // hostArgs
+    // (optionalAttrs (inputs ? trivnixLib) {
+      trivnixLib = inputs.trivnixLib.lib.for { inherit selfArg pkgs; };
+    });
 
   modules =
     hostModules
