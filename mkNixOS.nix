@@ -88,7 +88,7 @@ nixosSystem {
             extraSpecialArgs = generalArgs // hostArgs // { isNixos = true; };
 
             backupFileExtension = builtins.readFile (
-              pkgs.runCommandNoCC "timestamp" { } "echo -n $(date '+%d-%m-%Y-%H-%M-%S')-backup > $out"
+              pkgs.runCommand "timestamp" { } "echo -n $(date '+%d-%m-%Y-%H-%M-%S')-backup > $out"
             );
 
             sharedModules = homeModules ++ [(importTree (selfArg + "/home"))];
