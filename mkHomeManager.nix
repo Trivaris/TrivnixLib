@@ -89,11 +89,7 @@ assert builtins.hasAttr configname configs;
 assert builtins.hasAttr username hostConfig.users;
 homeManagerConfiguration {
   inherit pkgs;
-  extraSpecialArgs =
-    generalArgs
-    // hostArgs
-    // homeArgs
-    // { isNixos = false; };
+  extraSpecialArgs = generalArgs // hostArgs // homeArgs // { isNixos = false; };
 
   modules =
     homeModules

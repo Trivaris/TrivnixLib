@@ -67,9 +67,7 @@ assert inputs ? trivnixLib;
 assert builtins.hasAttr configname configs;
 nixosSystem {
   inherit pkgs;
-  specialArgs =
-    generalArgs
-    // hostArgs;
+  specialArgs = generalArgs // hostArgs;
 
   modules =
     hostModules
