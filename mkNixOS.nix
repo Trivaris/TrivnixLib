@@ -72,10 +72,10 @@ nixosSystem {
 
   modules =
     hostModules
-    ++ (importTree (selfArg + "/host"))
     ++ [
       hostConfig.partitions
       hostConfig.hardware
+      (importTree (selfArg + "/host"))
 
       {
         config = {
@@ -91,7 +91,7 @@ nixosSystem {
               pkgs.runCommandNoCC "timestamp" { } "echo -n $(date '+%d-%m-%Y-%H-%M-%S')-backup > $out"
             );
 
-            sharedModules = homeModules ++ (importTree (selfArg + "/home"));
+            sharedModules = homeModules ++ [(importTree (selfArg + "/home"))];
 
             users = mapAttrs' (
               name: userPrefs:

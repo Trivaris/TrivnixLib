@@ -93,5 +93,5 @@ homeManagerConfiguration {
   extraSpecialArgs = generalArgs // hostArgs // homeArgs // { isNixos = false; };
 
   modules =
-    homeModules ++ [ { config = { inherit userPrefs; }; } ] ++ (importTree (selfArg + "/home"));
+    homeModules ++ [ { config = { inherit userPrefs; }; } (importTree (selfArg + "/home")) ];
 }
