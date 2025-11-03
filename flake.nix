@@ -15,7 +15,7 @@
         let
           mkStorePath = path: selfArg + (toString "/${path}");
           mkFlakePath = path: lib.removePrefix (selfArg + "/") (toString path);
-          getModueles =
+          getModules =
             path:
             builtins.attrNames (
               removeAttrs (nixpkgs.lib.packagesFromDirectoryRecursive {
@@ -50,6 +50,7 @@
               mkFlakePath
               recursiveAttrValues
               getColor
+              getModules
               ;
 
             mkHomeManager = import ./mkHomeManager.nix selfArg;
