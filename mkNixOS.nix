@@ -3,7 +3,7 @@ selfArg:
   inputs,
   overlays,
   trivnixConfigs,
-  importTree
+  importTree,
 }:
 {
   configname,
@@ -91,9 +91,7 @@ nixosSystem {
               pkgs.runCommandNoCC "timestamp" { } "echo -n $(date '+%d-%m-%Y-%H-%M-%S')-backup > $out"
             );
 
-            sharedModules =
-              homeModules
-              ++ (importTree (selfArg + "/home")));
+            sharedModules = homeModules ++ (importTree (selfArg + "/home"));
 
             users = mapAttrs' (
               name: userPrefs:
