@@ -3,6 +3,7 @@ selfArg:
   inputs,
   overlays,
   trivnixConfigs,
+  importTree,
 }:
 {
   configname,
@@ -94,8 +95,5 @@ homeManagerConfiguration {
   modules =
     homeModules
     ++ [ { config = { inherit userPrefs; }; } ]
-    ++ (trivnixLib.resolveDir {
-      dirPath = selfArg + "/home";
-      preset = "importList";
-    });
+    ++ (importTree (selfArg + "/home"));
 }

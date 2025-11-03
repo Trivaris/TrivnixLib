@@ -3,6 +3,7 @@ selfArg:
   inputs,
   overlays,
   trivnixConfigs,
+  importTree
 }:
 {
   configname,
@@ -71,10 +72,7 @@ nixosSystem {
 
   modules =
     hostModules
-    ++ (trivnixLib.resolveDir {
-      dirPath = selfArg + "/host";
-      preset = "importList";
-    })
+    ++ (importTree (selfArg + "/host"))
     ++ [
       hostConfig.partitions
       hostConfig.hardware
@@ -95,10 +93,7 @@ nixosSystem {
 
             sharedModules =
               homeModules
-              ++ (trivnixLib.resolveDir {
-                dirPath = selfArg + "/home";
-                preset = "importList";
-              });
+              ++ (importTree (selfArg + "/home")));
 
             users = mapAttrs' (
               name: userPrefs:
