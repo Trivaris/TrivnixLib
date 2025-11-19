@@ -42,72 +42,68 @@ let
     )
   ) allOtherHostConfigs;
 
-  generalArgs = {
-    inherit
-      inputs
-      trivnixLib
-      commonInfos
-      allHostInfos
-      allHostPrefs
-      allHostUserPrefs
-      allHostUserInfos
-      ;
-  };
-
-  hostArgs = {
-    inherit hostInfos allUserPrefs allUserInfos;
-  };
-
   pkgs = import inputs.nixpkgs {
     system = hostConfig.infos.architecture;
     overlays = builtins.attrValues overlays;
     config = hostConfig.pkgsConfig;
   };
+
+  specialArgs = {
+    inherit
+      trivnixLib
+      commonInfos
+      hostInfos
+      allHostInfos
+      allHostPrefs
+      allHostUserPrefs
+      allHostUserInfos
+      allUserPrefs
+      allUserInfos
+      ;
+  };
 in
 assert inputs ? trivnixLib;
 assert builtins.hasAttr configname configs;
 nixosSystem {
-  inherit pkgs;
-  specialArgs = generalArgs // hostArgs;
+  inherit pkgs specialArgs;
 
-  modules =
-    hostModules
-    ++ [
-      hostConfig.partitions
-      hostConfig.hardware
-      (importTree (selfArg + "/host"))
+  modules = hostModules ++ [
+    hostConfig.partitions
+    hostConfig.hardware
+    (importTree (selfArg + "/host"))
 
-      {
-        config = {
-          inherit hostPrefs;
-          disko.enableConfig = true;
+    {
+      config = {
+        inherit hostPrefs;
+        disko.enableConfig = true;
 
-          home-manager = {
-            useUserPackages = true;
-            useGlobalPkgs = true;
-            extraSpecialArgs = generalArgs // hostArgs // { isNixos = true; };
-
-            backupFileExtension = builtins.readFile (
-              pkgs.runCommand "timestamp" { } "echo -n $(date '+%d-%m-%Y-%H-%M-%S')-backup > $out"
-            );
-
-            sharedModules = homeModules ++ [(importTree (selfArg + "/home"))];
-
-            users = mapAttrs' (
-              name: userPrefs:
-              let
-                userInfos = hostConfig.users.${name}.infos // {
-                  inherit name;
-                };
-              in
-              nameValuePair name {
-                config = { inherit userPrefs; };
-                imports = [ { _module.args = { inherit userInfos; }; } ];
-              }
-            ) allUserPrefs;
+        home-manager = {
+          useUserPackages = true;
+          useGlobalPkgs = true;
+          extraSpecialArgs = specialArgs // {
+            isNixos = true;
           };
+          sharedModules = homeModules ++ [ (importTree (selfArg + "/home")) ];
+
+          backupFileExtension = builtins.readFile (
+            pkgs.runCommand "timestamp" { } "echo -n $(date '+%d-%m-%Y-%H-%M-%S')-backup > $out"
+          );
+
+          users = mapAttrs' (
+            name: userPrefs:
+            let
+              userInfos = hostConfig.users.${name}.infos // {
+                inherit name;
+              };
+            in
+            nameValuePair name {
+              config = { inherit userPrefs; };
+              imports = [ { _module.args = { inherit userInfos; }; } ];
+            }
+          ) allUserPrefs;
         };
-      }
-    ];
+      };
+    }
+  ];
 
 }

@@ -21,21 +21,21 @@ let
   hostPrefs = hostConfig.prefs // {
     stylix = null;
   };
+
   userConfig = hostConfig.users.${username};
   userPrefs = userConfig.prefs // {
     stylix = hostConfig.prefs.stylix;
   };
+
   allOtherHostConfigs = removeAttrs configs [ configname ];
   allOtherUserConfigs = removeAttrs hostConfig.users [ username ];
-  allHostInfos = mapAttrs' (name: value: nameValuePair name value.infos) allOtherHostConfigs;
-  allHostPrefs = mapAttrs' (name: value: nameValuePair name value.prefs) allOtherHostConfigs;
-  allUserPrefs = mapAttrs' (name: value: nameValuePair name value.prefs) allOtherUserConfigs;
-  allUserInfos = mapAttrs' (name: value: nameValuePair name value.infos) allOtherUserConfigs;
 
-  # Extra args specific to home configs
-  homeArgs = {
-    userInfos = userInfos;
-  };
+  getAttrs = attrName: attrs: mapAttrs' (name: value: nameValuePair name value.${attrName}) attrs;
+
+  allHostInfos = getAttrs "infos" allOtherHostConfigs;
+  allHostPrefs = getAttrs "prefs" allOtherHostConfigs;
+  allUserPrefs = getAttrs "prefs" allOtherUserConfigs;
+  allUserInfos = getAttrs "infos" allOtherUserConfigs;
 
   hostInfos = hostConfig.infos // {
     inherit configname;
@@ -59,27 +59,6 @@ let
     )
   ) allOtherHostConfigs;
 
-  generalArgs = {
-    inherit
-      inputs
-      trivnixLib
-      commonInfos
-      allHostInfos
-      allHostPrefs
-      allHostUserPrefs
-      allHostUserInfos
-      ;
-  };
-
-  hostArgs = {
-    inherit
-      hostInfos
-      hostPrefs
-      allUserPrefs
-      allUserInfos
-      ;
-  };
-
   pkgs = import inputs.nixpkgs {
     system = hostConfig.infos.architecture;
     overlays = builtins.attrValues overlays;
@@ -90,8 +69,27 @@ assert builtins.hasAttr configname configs;
 assert builtins.hasAttr username hostConfig.users;
 homeManagerConfiguration {
   inherit pkgs;
-  extraSpecialArgs = generalArgs // hostArgs // homeArgs // { isNixos = false; };
 
-  modules =
-    homeModules ++ [ { config = { inherit userPrefs; }; } (importTree (selfArg + "/home")) ];
+  extraSpecialArgs = {
+    isNixos = false;
+    inherit
+      inputs
+      trivnixLib
+      commonInfos
+      userInfos
+      allHostInfos
+      allHostPrefs
+      allHostUserPrefs
+      allHostUserInfos
+      hostInfos
+      hostPrefs
+      allUserPrefs
+      allUserInfos
+      ;
+  };
+
+  modules = homeModules ++ [
+    { config = { inherit userPrefs; }; }
+    (importTree (selfArg + "/home"))
+  ];
 }

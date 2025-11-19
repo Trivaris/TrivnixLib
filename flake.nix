@@ -56,10 +56,6 @@
             mkHomeManager = import ./mkHomeManager.nix selfArg;
             mkNixOS = import ./mkNixOS.nix selfArg;
 
-            resolveDir = import ./resolveDir.nix {
-              inherit inputs;
-            };
-
             mkReverseProxyOption = import ./mkReverseProxyOption.nix {
               inherit (lib) types mkOption mkEnableOption;
             };
