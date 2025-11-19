@@ -50,6 +50,7 @@ let
 
   specialArgs = {
     inherit
+      inputs
       trivnixLib
       commonInfos
       hostInfos
