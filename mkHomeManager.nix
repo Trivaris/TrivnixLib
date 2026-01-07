@@ -3,13 +3,14 @@
   home-manager,
   nixpkgs,
   stylix,
+  self,
   ...
 }:
 {
   overlays,
   configs,
   modules,
-  self,
+  selfArg,
 }:
 {
   hostConfig,
@@ -29,8 +30,9 @@ let
   allUserPrefs = collectAttrs "prefs" hostConfig.users;
 in
 home-manager.lib.homeManagerConfiguration {
-  extraSpecialArgs = {
+  extraSpecialArgs = extraArgs // {
     isNixos = false;
+    trivnixLib = self.lib;
     inherit
       hostPrefs
       hostInfos
@@ -44,7 +46,7 @@ home-manager.lib.homeManagerConfiguration {
 
   modules = modules.home ++ [
     stylix.homeModules.stylix
-    (importTree (self + "/home"))
+    (importTree (selfArg + "/home"))
     { inherit userPrefs; }
     { userConfig.stylix = hostConfig.prefs.stylix; }
     {

@@ -3,13 +3,14 @@
   home-manager,
   stylix,
   importTree,
+  self,
   ...
 }:
 {
   overlays,
   configs,
   modules,
-  self,
+  selfArg,
 }:
 hostConfig:
 let
@@ -24,6 +25,7 @@ let
 in
 nixpkgs.lib.nixosSystem {
   specialArgs = {
+    trivnixLib = self.lib;
     inherit
       hostInfos
       allHostInfos
@@ -38,7 +40,7 @@ nixpkgs.lib.nixosSystem {
     stylix.nixosModules.stylix
     hostConfig.partitions
     hostConfig.hardware
-    (importTree (self + "/host"))
+    (importTree (selfArg + "/host"))
     { inherit hostPrefs; }
     { disko.enableConfig = true; }
     {
@@ -52,7 +54,7 @@ nixpkgs.lib.nixosSystem {
       { pkgs, ... }:
       {
         home-manager = {
-          sharedModules = modules.home ++ [ (importTree (self + "/home")) ];
+          sharedModules = modules.home ++ [ (importTree (selfArg + "/home")) ];
           extraSpecialArgs = {
             isNixos = true;
           };
