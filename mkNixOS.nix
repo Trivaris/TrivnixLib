@@ -22,10 +22,10 @@ let
   allHostPrefs = collectAttrs "prefs" configs;
   allUserInfos = collectAttrs "infos" hostConfig.users;
   allUserPrefs = collectAttrs "prefs" hostConfig.users;
-in
-nixpkgs.lib.nixosSystem {
+  
   specialArgs = {
     trivnixLib = self.lib;
+    isNixos = true;
     inherit
       hostInfos
       allHostInfos
@@ -34,6 +34,9 @@ nixpkgs.lib.nixosSystem {
       allUserPrefs
       ;
   };
+in
+nixpkgs.lib.nixosSystem {
+inherit specialArgs;
 
   modules = modules.host ++ [
     home-manager.nixosModules.home-manager
@@ -55,9 +58,7 @@ nixpkgs.lib.nixosSystem {
       {
         home-manager = {
           sharedModules = modules.home ++ [ (importTree (selfArg + "/home")) ];
-          extraSpecialArgs = {
-            isNixos = true;
-          };
+          extraSpecialArgs = specialArgs;
 
           backupFileExtension = builtins.readFile (
             pkgs.runCommand "timestamp" { } "echo -n $(date '+%d-%m-%Y-%H-%M-%S')-backup > $out"
