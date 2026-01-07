@@ -61,18 +61,16 @@ nixpkgs.lib.nixosSystem {
             pkgs.runCommand "timestamp" { } "echo -n $(date '+%d-%m-%Y-%H-%M-%S')-backup > $out"
           );
 
-          users = mapAttrs' (
-            name: userPrefs:
-            let
-              userInfos = hostConfig.users.${name}.infos // {
-                inherit name;
-              };
-            in
-            nameValuePair name {
-              config = { inherit userPrefs; };
-              imports = [ { _module.args = { inherit userInfos; }; } ];
-            }
-          ) allUserPrefs;
+          users = mapAttrs (name: userPrefs: {
+            config = { inherit userPrefs; };
+            imports = [
+              {
+                _module.args = {
+                  userInfos = hostConfig.users.${name}.infos;
+                };
+              }
+            ];
+          }) allUserPrefs;
         };
       }
     )
