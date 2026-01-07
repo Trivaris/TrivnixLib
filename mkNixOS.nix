@@ -57,6 +57,8 @@ inherit specialArgs;
       { pkgs, ... }:
       {
         home-manager = {
+          useGlobalPkgs = true;
+          useUserPackages = true;
           sharedModules = modules.home ++ [ (importTree (selfArg + "/home")) ];
           extraSpecialArgs = specialArgs;
 
