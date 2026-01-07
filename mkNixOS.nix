@@ -53,9 +53,7 @@ nixpkgs.lib.nixosSystem {
       {
         home-manager = {
           sharedModules = modules.home ++ [ (importTree (self + "/home")) ];
-          extraSpecialArgs = specialArgs // {
-            isNixos = true;
-          };
+          extraSpecialArgs = { isNixos = true; };
 
           backupFileExtension = builtins.readFile (
             pkgs.runCommand "timestamp" { } "echo -n $(date '+%d-%m-%Y-%H-%M-%S')-backup > $out"
