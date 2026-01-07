@@ -1,81 +1,53 @@
-selfArg:
 {
-  inputs,
-  overlays,
-  trivnixConfigs,
   importTree,
+  home-manager,
+  nixpkgs,
+  stylix,
+  ...
+}:
+{
+  overlays,
+  configs,
+  modules,
+  self,
 }:
 {
   configname,
   username,
-  homeModules,
 }:
 let
-  inherit (inputs.nixpkgs.lib) mapAttrs' nameValuePair;
-  inherit (inputs.home-manager.lib) homeManagerConfiguration;
-  inherit (trivnixConfigs) configs commonInfos;
-
-  trivnixLib = inputs.trivnixLib.lib.for { inherit selfArg pkgs; };
-
   hostConfig = configs.${configname};
-  hostPrefs = hostConfig.prefs // {
-    stylix = null;
-  };
+  hostPrefs = removeAttrs hostConfig.prefs [ "stylix" ];
+  hostInfos = hostConfig.infos;
 
   userConfig = hostConfig.users.${username};
   userPrefs = userConfig.prefs // {
-    stylix = hostConfig.prefs.stylix;
+    inherit (hostConfig.prefs) stylix;
+  };
+  userInfos = userConfig.infos // {
+    name = username;
   };
 
-  allOtherHostConfigs = removeAttrs configs [ configname ];
-  allOtherUserConfigs = removeAttrs hostConfig.users [ username ];
-
-  getAttrs = attrName: attrs: mapAttrs' (name: value: nameValuePair name value.${attrName}) attrs;
-
+  getAttrs =
+    attrName: attrs:
+    nixpkgs.lib.mapAttrs' (name: value: nixpkgs.lib.nameValuePair name value.${attrName}) attrs;
   allHostInfos = getAttrs "infos" allOtherHostConfigs;
   allHostPrefs = getAttrs "prefs" allOtherHostConfigs;
   allUserPrefs = getAttrs "prefs" allOtherUserConfigs;
   allUserInfos = getAttrs "infos" allOtherUserConfigs;
 
-  hostInfos = hostConfig.infos // {
-    inherit configname;
-  };
-
-  userInfos = userConfig.infos // {
-    name = username;
-  };
-
-  allHostUserPrefs = mapAttrs' (
-    configname: config:
-    nameValuePair configname (
-      mapAttrs' (usrname: userconfig: nameValuePair usrname userconfig.prefs) config.users
-    )
+  allHostUserPrefs = nixpkgs.lib.mapAttrs (
+    _: config: (nixpkgs.lib.mapAttrs (_: userconfig: userconfig.prefs) config.users)
   ) allOtherHostConfigs;
 
-  allHostUserInfos = mapAttrs' (
-    configname: config:
-    nameValuePair configname (
-      mapAttrs' (usrname: userconfig: nameValuePair usrname userconfig.infos) config.users
-    )
+  allHostUserInfos = nixpkgs.lib.mapAttrs (
+    _: config: (nixpkgs.lib.mapAttrs (_: userconfig: userconfig.infos) config.users)
   ) allOtherHostConfigs;
-
-  pkgs = import inputs.nixpkgs {
-    system = hostConfig.infos.architecture;
-    overlays = builtins.attrValues overlays;
-    config = hostConfig.pkgsConfig;
-  };
 in
-assert builtins.hasAttr configname configs;
-assert builtins.hasAttr username hostConfig.users;
 homeManagerConfiguration {
-  inherit pkgs;
-
   extraSpecialArgs = {
     isNixos = false;
     inherit
-      inputs
-      trivnixLib
-      commonInfos
       userInfos
       allHostInfos
       allHostPrefs
@@ -88,8 +60,16 @@ homeManagerConfiguration {
       ;
   };
 
-  modules = homeModules ++ [
-    { config = { inherit userPrefs; }; }
-    (importTree (selfArg + "/home"))
+  modules = modules.home ++ [
+    stylix.homeModules.stylix
+    { inherit userPrefs; }
+    (importTree (self + "/home"))
+    {
+      nixpkgs = {
+        system = hostConfig.infos.architecture;
+        overlays = builtins.attrValues overlays;
+        config = hostConfig.pkgsConfig;
+      };
+    }
   ];
 }

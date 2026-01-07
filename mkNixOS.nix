@@ -1,58 +1,41 @@
-selfArg:
 {
-  inputs,
-  overlays,
-  trivnixConfigs,
+  nixpkgs,
+  home-manager,
+  stylix,
   importTree,
+  ...
+}:
+{
+  overlays,
+  configs,
+  modules,
+  self,
 }:
 {
   configname,
-  hostModules,
-  homeModules,
 }:
 let
-  inherit (inputs.nixpkgs.lib) mapAttrs' nameValuePair nixosSystem;
-  inherit (trivnixConfigs) configs commonInfos;
-
-  trivnixLib = inputs.trivnixLib.lib.for { inherit selfArg pkgs; };
-
   hostConfig = configs.${configname};
   hostPrefs = hostConfig.prefs;
-  allOtherHostConfigs = removeAttrs configs [ configname ];
-  allHostInfos = mapAttrs' (name: value: nameValuePair name value.infos) allOtherHostConfigs;
-  allHostPrefs = mapAttrs' (name: value: nameValuePair name value.prefs) allOtherHostConfigs;
-  allUserPrefs = mapAttrs' (name: value: nameValuePair name value.prefs) hostConfig.users;
-  allUserInfos = mapAttrs' (name: value: nameValuePair name value.infos) hostConfig.users;
+  hostInfos = hostConfig.infos;
 
-  hostInfos = hostConfig.infos // {
-    inherit configname;
-  };
+  getAttrs = attrName: attrs: nixpkgs.lib.mapAttrs (name: value: value.${attrName}) attrs;
+  allHostInfos = getAttrs "infos" configs;
+  allHostPrefs = getAttrs "prefs" configs;
+  allUserPrefs = getAttrs "prefs" configs;
+  allUserInfos = getAttrs "infos" configs;
 
-  allHostUserPrefs = mapAttrs' (
-    configname: config:
-    nameValuePair configname (
-      mapAttrs' (usrname: userconfig: nameValuePair usrname userconfig.prefs) config.users
-    )
+  allHostUserPrefs = nixpkgs.lib.mapAttrs (
+    _: config: (nixpkgs.lib.mapAttrs (_: userconfig: userconfig.prefs) config.users)
   ) allOtherHostConfigs;
 
-  allHostUserInfos = mapAttrs' (
-    configname: config:
-    nameValuePair configname (
-      mapAttrs' (usrname: userconfig: nameValuePair usrname userconfig.infos) config.users
-    )
+  allHostUserInfos = nixpkgs.lib.mapAttrs (
+    _: config: (nixpkgs.lib.mapAttrs (_: userconfig: userconfig.infos) config.users)
   ) allOtherHostConfigs;
-
-  pkgs = import inputs.nixpkgs {
-    system = hostConfig.infos.architecture;
-    overlays = builtins.attrValues overlays;
-    config = hostConfig.pkgsConfig;
-  };
-
+in
+nixpkgs.lib.nixosSystem {
   specialArgs = {
     inherit
-      inputs
-      trivnixLib
-      commonInfos
       hostInfos
       allHostInfos
       allHostPrefs
@@ -62,49 +45,54 @@ let
       allUserInfos
       ;
   };
-in
-assert inputs ? trivnixLib;
-assert builtins.hasAttr configname configs;
-nixosSystem {
-  inherit pkgs specialArgs;
 
-  modules = hostModules ++ [
+  modules = modules.host ++ [
+    home-manager.nixosModules.home-manager
+    stylix.nixosModules.stylix
     hostConfig.partitions
     hostConfig.hardware
-    (importTree (selfArg + "/host"))
-
+    (importTree (self + "/host"))
     {
-      config = {
-        inherit hostPrefs;
-        disko.enableConfig = true;
-
-        home-manager = {
-          useUserPackages = true;
-          useGlobalPkgs = true;
-          extraSpecialArgs = specialArgs // {
-            isNixos = true;
-          };
-          sharedModules = homeModules ++ [ (importTree (selfArg + "/home")) ];
-
-          backupFileExtension = builtins.readFile (
-            pkgs.runCommand "timestamp" { } "echo -n $(date '+%d-%m-%Y-%H-%M-%S')-backup > $out"
-          );
-
-          users = mapAttrs' (
-            name: userPrefs:
-            let
-              userInfos = hostConfig.users.${name}.infos // {
-                inherit name;
-              };
-            in
-            nameValuePair name {
-              config = { inherit userPrefs; };
-              imports = [ { _module.args = { inherit userInfos; }; } ];
-            }
-          ) allUserPrefs;
-        };
+      nixpkgs = {
+        system = hostConfig.infos.architecture;
+        overlays = builtins.attrValues overlays;
+        config = hostConfig.pkgsConfig;
       };
     }
+
+    (
+      { pkgs, ... }:
+      {
+        config = {
+          inherit hostPrefs;
+          disko.enableConfig = true;
+
+          home-manager = {
+            sharedModules = modules.home ++ [ (importTree (self + "/home")) ];
+            extraSpecialArgs = specialArgs // {
+              isNixos = true;
+            };
+
+            backupFileExtension = builtins.readFile (
+              pkgs.runCommand "timestamp" { } "echo -n $(date '+%d-%m-%Y-%H-%M-%S')-backup > $out"
+            );
+
+            users = mapAttrs' (
+              name: userPrefs:
+              let
+                userInfos = hostConfig.users.${name}.infos // {
+                  inherit name;
+                };
+              in
+              nameValuePair name {
+                config = { inherit userPrefs; };
+                imports = [ { _module.args = { inherit userInfos; }; } ];
+              }
+            ) allUserPrefs;
+          };
+        };
+      }
+    )
   ];
 
 }
