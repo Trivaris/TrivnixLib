@@ -11,29 +11,16 @@
   modules,
   self,
 }:
-{
-  configname,
-  config,
-}:
-assert config.configname == configname;
+hostConfig:
 let
-  hostConfig = config;
   hostPrefs = hostConfig.prefs;
   hostInfos = hostConfig.infos;
 
-  getAttrs = attrName: attrs: nixpkgs.lib.mapAttrs (name: value: value.${attrName}) attrs;
-  allHostInfos = getAttrs "infos" configs;
-  allHostPrefs = getAttrs "prefs" configs;
-  allUserPrefs = getAttrs "prefs" configs;
-  allUserInfos = getAttrs "infos" configs;
-
-  allHostUserPrefs = nixpkgs.lib.mapAttrs (
-    _: config: (nixpkgs.lib.mapAttrs (_: userconfig: userconfig.prefs) config.users)
-  ) allOtherHostConfigs;
-
-  allHostUserInfos = nixpkgs.lib.mapAttrs (
-    _: config: (nixpkgs.lib.mapAttrs (_: userconfig: userconfig.infos) config.users)
-  ) allOtherHostConfigs;
+  collectAttrs = attrName: attrs: nixpkgs.lib.mapAttrs (_: value: value.${attrName}) attrs;
+  allHostInfos = collectAttrs "infos" configs;
+  allHostPrefs = collectAttrs "prefs" configs;
+  allUserInfos = collectAttrs "infos" hostConfig.users;
+  allUserPrefs = collectAttrs "prefs" hostConfig.users;
 in
 nixpkgs.lib.nixosSystem {
   specialArgs = {
@@ -41,10 +28,8 @@ nixpkgs.lib.nixosSystem {
       hostInfos
       allHostInfos
       allHostPrefs
-      allHostUserPrefs
-      allHostUserInfos
-      allUserPrefs
       allUserInfos
+      allUserPrefs
       ;
   };
 
@@ -54,6 +39,8 @@ nixpkgs.lib.nixosSystem {
     hostConfig.partitions
     hostConfig.hardware
     (importTree (self + "/host"))
+    { config = hostPrefs; }
+    { disko.enableConfig = true; }
     {
       nixpkgs = {
         system = hostConfig.infos.architecture;
@@ -61,37 +48,31 @@ nixpkgs.lib.nixosSystem {
         config = hostConfig.pkgsConfig;
       };
     }
-
     (
       { pkgs, ... }:
       {
-        config = {
-          inherit hostPrefs;
-          disko.enableConfig = true;
-
-          home-manager = {
-            sharedModules = modules.home ++ [ (importTree (self + "/home")) ];
-            extraSpecialArgs = specialArgs // {
-              isNixos = true;
-            };
-
-            backupFileExtension = builtins.readFile (
-              pkgs.runCommand "timestamp" { } "echo -n $(date '+%d-%m-%Y-%H-%M-%S')-backup > $out"
-            );
-
-            users = mapAttrs' (
-              name: userPrefs:
-              let
-                userInfos = hostConfig.users.${name}.infos // {
-                  inherit name;
-                };
-              in
-              nameValuePair name {
-                config = { inherit userPrefs; };
-                imports = [ { _module.args = { inherit userInfos; }; } ];
-              }
-            ) allUserPrefs;
+        home-manager = {
+          sharedModules = modules.home ++ [ (importTree (self + "/home")) ];
+          extraSpecialArgs = specialArgs // {
+            isNixos = true;
           };
+
+          backupFileExtension = builtins.readFile (
+            pkgs.runCommand "timestamp" { } "echo -n $(date '+%d-%m-%Y-%H-%M-%S')-backup > $out"
+          );
+
+          users = mapAttrs' (
+            name: userPrefs:
+            let
+              userInfos = hostConfig.users.${name}.infos // {
+                inherit name;
+              };
+            in
+            nameValuePair name {
+              config = { inherit userPrefs; };
+              imports = [ { _module.args = { inherit userInfos; }; } ];
+            }
+          ) allUserPrefs;
         };
       }
     )

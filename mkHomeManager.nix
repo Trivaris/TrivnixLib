@@ -12,59 +12,41 @@
   self,
 }:
 {
-  configname,
   hostConfig,
-  username,
   userConfig,
 }:
-assert hostConfig.configname == configname;
 let
   hostPrefs = removeAttrs hostConfig.prefs [ "stylix" ];
   hostInfos = hostConfig.infos;
 
-  userPrefs = userConfig.prefs // {
-    inherit (hostConfig.prefs) stylix;
-  };
-  userInfos = userConfig.infos // {
-    name = username;
-  };
+  userPrefs = userConfig.prefs;
+  userInfos = userConfig.info;
 
-  getAttrs =
-    attrName: attrs:
-    nixpkgs.lib.mapAttrs' (name: value: nixpkgs.lib.nameValuePair name value.${attrName}) attrs;
-  allHostInfos = getAttrs "infos" allOtherHostConfigs;
-  allHostPrefs = getAttrs "prefs" allOtherHostConfigs;
-  allUserPrefs = getAttrs "prefs" allOtherUserConfigs;
-  allUserInfos = getAttrs "infos" allOtherUserConfigs;
-
-  allHostUserPrefs = nixpkgs.lib.mapAttrs (
-    _: config: (nixpkgs.lib.mapAttrs (_: userconfig: userconfig.prefs) config.users)
-  ) allOtherHostConfigs;
-
-  allHostUserInfos = nixpkgs.lib.mapAttrs (
-    _: config: (nixpkgs.lib.mapAttrs (_: userconfig: userconfig.infos) config.users)
-  ) allOtherHostConfigs;
+  collectAttrs = attrName: attrs: nixpkgs.lib.mapAttrs (_: value: value.${attrName}) attrs;
+  allHostInfos = collectAttrs "infos" configs;
+  allHostPrefs = collectAttrs "prefs" configs;
+  allUserInfos = collectAttrs "infos" hostConfig.users;
+  allUserPrefs = collectAttrs "prefs" hostConfig.users;
 in
-homeManagerConfiguration {
+home-manager.lib.homeManagerConfiguration {
   extraSpecialArgs = {
     isNixos = false;
     inherit
+      hostPrefs
+      hostInfos
       userInfos
       allHostInfos
       allHostPrefs
-      allHostUserPrefs
-      allHostUserInfos
-      hostInfos
-      hostPrefs
-      allUserPrefs
       allUserInfos
+      allUserPrefs
       ;
   };
 
   modules = modules.home ++ [
     stylix.homeModules.stylix
-    { inherit userPrefs; }
     (importTree (self + "/home"))
+    { config = userPrefs; }
+    { config = { inherit (hostConfig.prefs) stylix; }; }
     {
       nixpkgs = {
         system = hostConfig.infos.architecture;
