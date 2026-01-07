@@ -13,14 +13,15 @@
 }:
 {
   configname,
+  hostConfig,
   username,
+  userConfig,
 }:
+assert hostConfig.configname == configname;
 let
-  hostConfig = configs.${configname};
   hostPrefs = removeAttrs hostConfig.prefs [ "stylix" ];
   hostInfos = hostConfig.infos;
 
-  userConfig = hostConfig.users.${username};
   userPrefs = userConfig.prefs // {
     inherit (hostConfig.prefs) stylix;
   };

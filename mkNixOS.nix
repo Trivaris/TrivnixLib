@@ -13,9 +13,11 @@
 }:
 {
   configname,
+  config,
 }:
+assert config.configname == configname;
 let
-  hostConfig = configs.${configname};
+  hostConfig = config;
   hostPrefs = hostConfig.prefs;
   hostInfos = hostConfig.infos;
 
