@@ -45,8 +45,8 @@ home-manager.lib.homeManagerConfiguration {
   modules = modules.home ++ [
     stylix.homeModules.stylix
     (importTree (self + "/home"))
-    { config = userPrefs; }
-    { config = { inherit (hostConfig.prefs) stylix; }; }
+    { inherit userPrefs; }
+    { userConfig.stylix = hostConfig.prefs.stylix; }
     {
       nixpkgs = {
         system = hostConfig.infos.architecture;

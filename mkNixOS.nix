@@ -39,7 +39,7 @@ nixpkgs.lib.nixosSystem {
     hostConfig.partitions
     hostConfig.hardware
     (importTree (self + "/host"))
-    { config = hostPrefs; }
+    { inherit hostPrefs; }
     { disko.enableConfig = true; }
     {
       nixpkgs = {
@@ -53,7 +53,9 @@ nixpkgs.lib.nixosSystem {
       {
         home-manager = {
           sharedModules = modules.home ++ [ (importTree (self + "/home")) ];
-          extraSpecialArgs = { isNixos = true; };
+          extraSpecialArgs = {
+            isNixos = true;
+          };
 
           backupFileExtension = builtins.readFile (
             pkgs.runCommand "timestamp" { } "echo -n $(date '+%d-%m-%Y-%H-%M-%S')-backup > $out"
