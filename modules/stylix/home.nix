@@ -1,4 +1,4 @@
 { lib, ... }:
 {
-  options.userPrefs.stylix = import ./stylixOptions.nix lib;
+  options.userPrefs.stylix = import ./options.nix lib;
 }
