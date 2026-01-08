@@ -42,6 +42,7 @@ nixpkgs.lib.nixosSystem {
   modules = modules.host ++ [
     home-manager.nixosModules.home-manager
     stylix.nixosModules.stylix
+    self.nixosModules.default
     hostConfig.partitions
     hostConfig.hardware
     (importTree (selfArg + "/host"))
