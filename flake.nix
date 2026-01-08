@@ -39,6 +39,6 @@
             self.homeManagerModules.stylix
           ];
         };
-      }
+      };
     };
 }
