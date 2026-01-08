@@ -35,7 +35,6 @@ home-manager.lib.homeManagerConfiguration {
     trivnixLib = self.lib;
     inherit
       hostPrefs
-      hostInfos
       userInfos
       allHostInfos
       allHostPrefs

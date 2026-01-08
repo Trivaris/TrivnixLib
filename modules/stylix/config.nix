@@ -30,4 +30,4 @@ in
       package = pkgs.nerd-fonts.${prefs.stylix.nerdfont};
     };
   };
-};
+}
