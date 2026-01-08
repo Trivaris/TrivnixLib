@@ -17,7 +17,7 @@
   userConfig,
 }:
 let
-  hostPrefs = removeAttrs hostConfig.prefs [ "stylix" ];
+  hostPrefs = hostConfig.prefs;
   hostInfos = hostConfig.infos;
 
   userPrefs = userConfig.prefs;
@@ -49,7 +49,7 @@ home-manager.lib.homeManagerConfiguration {
     stylix.homeModules.stylix
     (importTree (selfArg + "/home"))
     { config = { inherit userPrefs; }; }
-    { userConfig.stylix = hostConfig.prefs.stylix; }
+    { userPrefs.stylix = hostConfig.stylix; }
     {
       nixpkgs = {
         system = hostConfig.infos.architecture;

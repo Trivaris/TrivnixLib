@@ -46,6 +46,7 @@ inherit specialArgs;
     hostConfig.hardware
     (importTree (selfArg + "/host"))
     { inherit hostPrefs; }
+    { hostPrefs.stylix = hostConfig.stylix; }
     { disko.enableConfig = true; }
     {
       nixpkgs = {
