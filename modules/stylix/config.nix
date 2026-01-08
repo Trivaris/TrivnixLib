@@ -1,10 +1,7 @@
 prefs: pkgs:
-let
-  theme = "${pkgs.base16-schemes}/share/themes/${prefs.stylix.colorscheme}.yaml";
-in
 {
   enable = true;
-  base16Scheme = theme;
+  base16Scheme = prefs.stylix.theme;
   polarity = if prefs.stylix.darkmode then "dark" else "light";
   targets.gtk.enable = true;
 
