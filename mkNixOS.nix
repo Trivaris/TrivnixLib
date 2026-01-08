@@ -79,11 +79,7 @@ nixpkgs.lib.nixosSystem {
           users = nixpkgs.lib.mapAttrs (name: userPrefs: {
             config = { inherit userPrefs; };
             imports = [
-              {
-                _module.args = {
-                  userInfos = hostConfig.users.${name}.infos;
-                };
-              }
+              { userInfos = hostConfig.users.${name}.infos; }
             ];
           }) allUserPrefs;
         };

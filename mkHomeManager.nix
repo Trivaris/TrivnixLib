@@ -37,7 +37,6 @@ home-manager.lib.homeManagerConfiguration {
     trivnixLib = self.lib;
     inherit
       hostPrefs
-      userInfos
       allHostInfos
       allHostPrefs
       allUserInfos
@@ -52,6 +51,7 @@ home-manager.lib.homeManagerConfiguration {
     (importTree (selfArg + "/home"))
     { inherit userPrefs; }
     { inherit hostInfos; }
+    { inherit userInfos; }
     { inherit stylixPrefs; }
     {
       nixpkgs = {
