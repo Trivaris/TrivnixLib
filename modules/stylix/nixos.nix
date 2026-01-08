@@ -6,6 +6,7 @@
 }:
 let
   prefs = config.hostPrefs;
+  theme = "${pkgs.base16-schemes}/share/themes/${prefs.stylix.colorscheme}.yaml";
 in
 {
   options.hostPrefs.stylix = import ./options.nix lib;

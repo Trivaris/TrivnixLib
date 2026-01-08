@@ -6,6 +6,7 @@
 }:
 let
   prefs = config.userPrefs;
+  theme = "${pkgs.base16-schemes}/share/themes/${prefs.stylix.colorscheme}.yaml";
 in
 {
   options.userPrefs.stylix = import ./options.nix lib;
