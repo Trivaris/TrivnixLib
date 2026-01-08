@@ -69,6 +69,7 @@ nixpkgs.lib.nixosSystem {
             self.nixosModules.stylixOptions
             (importTree (selfArg + "/home"))
             { inherit hostInfos; }
+            { inherit stylixPrefs; }
           ];
 
           backupFileExtension = builtins.readFile (
