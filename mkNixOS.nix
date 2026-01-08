@@ -17,6 +17,8 @@ let
   hostPrefs = hostConfig.prefs;
   hostInfos = hostConfig.infos;
 
+  stylixPrefs = hostConfig.stylix;
+
   collectAttrs = attrName: attrs: nixpkgs.lib.mapAttrs (_: value: value.${attrName}) attrs;
   allHostInfos = collectAttrs "infos" configs;
   allHostPrefs = collectAttrs "prefs" configs;
@@ -45,7 +47,9 @@ nixpkgs.lib.nixosSystem {
     hostConfig.partitions
     hostConfig.hardware
     (importTree (selfArg + "/host"))
-    { inherit hostPrefs hostInfos; }
+    { inherit hostPrefs; }
+    { inherit hostInfos; }
+    { inherit stylixPrefs; }
     {
       nixpkgs = {
         system = hostConfig.infos.architecture;
@@ -62,7 +66,7 @@ nixpkgs.lib.nixosSystem {
           extraSpecialArgs = specialArgs;
           sharedModules = modules.home ++ [
             self.nixosModules.default
-            self.homeManagerModules.stylixOptions
+            self.nixosModules.stylixOptions
             (importTree (selfArg + "/home"))
             { inherit hostInfos; }
           ];

@@ -23,6 +23,8 @@ let
   userPrefs = userConfig.prefs;
   userInfos = userConfig.info;
 
+  stylixPrefs = hostConfig.stylix;
+
   collectAttrs = attrName: attrs: nixpkgs.lib.mapAttrs (_: value: value.${attrName}) attrs;
   allHostInfos = collectAttrs "infos" configs;
   allHostPrefs = collectAttrs "prefs" configs;
@@ -44,11 +46,13 @@ home-manager.lib.homeManagerConfiguration {
   };
 
   modules = modules.home ++ [
-    self.homeManagerModules.default
+    self.nixosModules.stylix
+    self.nixosModules.default
     stylix.homeManagerModules.default
     (importTree (selfArg + "/home"))
     { inherit userPrefs; }
     { inherit hostInfos; }
+    { inherit stylixPrefs; }
     {
       nixpkgs = {
         system = hostConfig.infos.architecture;

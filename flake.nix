@@ -14,12 +14,19 @@
       lib = import ./lib.nix inputs;
 
       nixosModules = {
-        stylix = import ./modules/stylix/nixos.nix;
+        stylixConfig = import ./modules/stylix/config.nix;
+        stylixOptions = import ./modules/stylix/options.nix;
         hostInfos = import ./modules/hostInfos.nix;
         calendarAccounts = import ./modules/calendarAccounts.nix;
         emailAccounts = import ./modules/emailAccounts.nix;
         pubKeys = import ./modules/pubKeys.nix;
         secrets = import ./modules/secrets.nix;
+        stylix = _: {
+          import = [
+            self.stylixConfig
+            self.stylixOptions
+          ];
+        };
         default = _: {
           imports = [
             self.nixosModules.hostInfos
@@ -27,17 +34,6 @@
             self.nixosModules.emailAccounts
             self.nixosModules.pubKeys
             self.nixosModules.secrets
-          ];
-        };
-      };
-
-      homeManagerModules = {
-        stylixOptions = import ./modules/stylix/homeOptions.nix;
-        stylixConfig = import ./modules/stylix/homeConfig.nix;
-        default = _: {
-          imports = [
-            self.homeManagerModules.stylixOptions
-            self.homeManagerModules.stylixConfig
           ];
         };
       };

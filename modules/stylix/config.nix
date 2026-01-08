@@ -1,19 +1,23 @@
-prefs: pkgs: {
+{ config, pkgs, ... }:
+let
+  prefs = config.stylixPrefs;
+in
+{
   enable = true;
-  base16Scheme = prefs.stylix.theme;
-  polarity = if prefs.stylix.darkmode then "dark" else "light";
+  base16Scheme = prefs.theme;
+  polarity = if prefs.darkmode then "dark" else "light";
   targets.gtk.enable = true;
 
   cursor = {
-    package = pkgs.${prefs.stylix.cursorPackage};
-    name = prefs.stylix.cursorName;
-    size = prefs.stylix.cursorSize;
+    package = pkgs.${prefs.cursorPackage};
+    name = prefs.cursorName;
+    size = prefs.cursorSize;
   };
 
   fonts = {
     serif = {
-      name = prefs.stylix.nerdfont;
-      package = pkgs.nerd-fonts.${prefs.stylix.nerdfont};
+      name = prefs.nerdfont;
+      package = pkgs.nerd-fonts.${prefs.nerdfont};
     };
 
     monospace = {
@@ -22,8 +26,8 @@ prefs: pkgs: {
     };
 
     sansSerif = {
-      name = prefs.stylix.nerdfont;
-      package = pkgs.nerd-fonts.${prefs.stylix.nerdfont};
+      name = prefs.nerdfont;
+      package = pkgs.nerd-fonts.${prefs.nerdfont};
     };
   };
 }
