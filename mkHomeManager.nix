@@ -46,10 +46,10 @@ home-manager.lib.homeManagerConfiguration {
 
   modules = modules.home ++ [
     self.homeManagerModules.default
-    stylix.homeModules.stylix
+    stylix.homeManagerModules.default
     (importTree (selfArg + "/home"))
     { inherit userPrefs; }
-    { userPrefs.stylix = hostConfig.stylix; }
+    { inherit hostInfos; }
     {
       nixpkgs = {
         system = hostConfig.infos.architecture;

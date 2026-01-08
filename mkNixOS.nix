@@ -45,10 +45,7 @@ nixpkgs.lib.nixosSystem {
     hostConfig.partitions
     hostConfig.hardware
     (importTree (selfArg + "/host"))
-    { inherit hostPrefs; }
-    { inherit hostInfos; }
-    { hostPrefs.stylix = hostConfig.stylix; }
-    { disko.enableConfig = true; }
+    { inherit hostPrefs hostInfos; }
     {
       nixpkgs = {
         system = hostConfig.infos.architecture;
@@ -62,8 +59,13 @@ nixpkgs.lib.nixosSystem {
         home-manager = {
           useGlobalPkgs = true;
           useUserPackages = true;
-          sharedModules = modules.home ++ [ (importTree (selfArg + "/home")) ];
           extraSpecialArgs = specialArgs;
+          sharedModules = modules.home ++ [
+            self.nixosModules.default
+            self.homeManagerModules.stylixOptions
+            (importTree (selfArg + "/home"))
+            { inherit hostInfos; }
+          ];
 
           backupFileExtension = builtins.readFile (
             pkgs.runCommand "timestamp" { } "echo -n $(date '+%d-%m-%Y-%H-%M-%S')-backup > $out"
@@ -72,8 +74,6 @@ nixpkgs.lib.nixosSystem {
           users = nixpkgs.lib.mapAttrs (name: userPrefs: {
             config = { inherit userPrefs; };
             imports = [
-              self.nixosModules.default
-              self.homeManagerModules.stylixOptions
               {
                 _module.args = {
                   userInfos = hostConfig.users.${name}.infos;
