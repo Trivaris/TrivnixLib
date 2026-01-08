@@ -49,8 +49,8 @@ prefs: pkgs: {
     '';
   };
 
-  nerdfont = lib.mkOption {
-    type = lib.types.str;
+  nerdfont = pkgs.lib.mkOption {
+    type = pkgs.lib.types.str;
     example = "ubuntu";
     description = ''
       Nerd Font base name used for monospace, sans-serif, and serif fonts.
