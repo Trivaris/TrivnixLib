@@ -2,7 +2,7 @@
   nixpkgs,
   self,
   ...
-}:
+}@inputs:
 {
   getModules =
     path:
