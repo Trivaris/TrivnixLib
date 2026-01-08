@@ -26,6 +26,7 @@ let
   specialArgs = {
     trivnixLib = self.lib;
     isNixos = true;
+    isHomeManager = false;
     inherit
       hostInfos
       allHostInfos
@@ -60,7 +61,7 @@ inherit specialArgs;
           useGlobalPkgs = true;
           useUserPackages = true;
           sharedModules = modules.home ++ [ (importTree (selfArg + "/home")) ];
-          extraSpecialArgs = specialArgs;
+          extraSpecialArgs = specialArgs // { isHomeManager = true; };
 
           backupFileExtension = builtins.readFile (
             pkgs.runCommand "timestamp" { } "echo -n $(date '+%d-%m-%Y-%H-%M-%S')-backup > $out"

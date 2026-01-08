@@ -32,6 +32,7 @@ in
 home-manager.lib.homeManagerConfiguration {
   extraSpecialArgs = extraArgs // {
     isNixos = false;
+    isHomeManager = true;
     trivnixLib = self.lib;
     inherit
       hostPrefs
