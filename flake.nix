@@ -11,42 +11,34 @@
   outputs =
     { self, nixpkgs, ... }@inputs:
     {
-      lib = {
-        getModules =
-          path:
-          builtins.attrNames (
-            removeAttrs (nixpkgs.lib.packagesFromDirectoryRecursive {
-              directory = path;
-              callPackage = (x: _: x);
-            }) [ "default" ]
-          );
+      lib = import ./lib.nix inputs;
 
-        getColor =
-          pkgs: scheme: name:
-          nixpkgs.lib.pipe
-            (pkgs.runCommand "color-${name}" {
-              inherit scheme;
-              nativeBuildInputs = [ pkgs.yq ];
-            } "yq -r '.palette.${name}' \"${scheme}\" > $out")
-            [
-              builtins.readFile
-              (builtins.replaceStrings [ "\n" ] [ "" ])
-            ];
-
-        recursiveAttrValues =
-          attrs:
-          nixpkgs.lib.pipe attrs [
-            builtins.attrValues
-            (map (value: if nixpkgs.lib.isAttrs value then self.lib.recursiveAttrValues value else [ value ]))
-            builtins.concatLists
+      nixosModules = {
+        stylix = import ./modules/stylix/nixos.nix;
+        hostInfos = import ./modules/hostInfos.nix;
+        calendarAccounts = import ./modules/calendarAccounts.nix;
+        emailAccounts = import ./modules/emailAccounts.nix;
+        pubKeys = import ./modules/pubKeys.nix;
+        secrets = import ./modules/secrets.nix;
+        default = _: {
+          imports = [
+            self.nixosModules.stylix
+            self.nixosModules.hostInfos
+            self.nixosModules.calendarAccounts
+            self.nixosModules.emailAccounts
+            self.nixosModules.pubKeys
+            self.nixosModules.secrets
           ];
-
-        mkHomeManager = import ./mkHomeManager.nix inputs;
-        mkNixOS = import ./mkNixOS.nix inputs;
-
-        mkReverseProxyOption = import ./mkReverseProxyOption.nix {
-          inherit (nixpkgs.lib) types mkOption mkEnableOption;
         };
       };
+
+      homeManagerModules = {
+        stylix = import ./modules/stylix/home.nix;
+        default = _: {
+          imports = [
+            self.homeManagerModules.stylix
+          ];
+        };
+      }
     };
 }
