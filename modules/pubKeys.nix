@@ -1,64 +1,45 @@
 { lib, config, ... }:
 let
-  inherit (lib) mkOption types;
 
-  readTree =
-    path:
-    let
-      entries = builtins.readDir path;
-    in
-    lib.mapAttrs (
-      name: type: if type == "directory" then readTree (path + "/${name}") else path + "/${name}"
-    ) entries;
+  keyType = lib.types.path;
 
-  keyType = types.path;
-
-  keyOption = mkOption {
+  keyOption = lib.mkOption {
     type = keyType;
     description = "Path to the public key file";
     readOnly = true;
   };
 
-  commonSubmodule = types.submodule {
+  commonSubmodule = lib.types.submodule {
     options = {
-      ssh = mkOption {
-        type = types.attrsOf keyType;
+      ssh = lib.mkOption {
+        type = lib.types.attrsOf keyType;
         description = "Common SSH keys";
         default = { };
       };
     };
-    freeformType = types.attrsOf (types.attrsOf keyType);
+    freeformType = lib.types.attrsOf (lib.types.attrsOf keyType);
   };
 
-  hostSubmodule = types.submodule {
+  hostSubmodule = lib.types.submodule {
     options = {
       "host.pub" = keyOption;
 
-      users = mkOption {
+      users = lib.mkOption {
         description = "User keys for this host";
         default = { };
-        type = types.attrsOf (types.attrsOf keyType);
+        type = lib.types.attrsOf (lib.types.attrsOf keyType);
       };
     };
   };
-
-  rawTree = readTree ./pubKeys;
 in
 {
   options.private.pubKeys = {
-    common = mkOption {
+    common = lib.mkOption {
       type = commonSubmodule;
-      default = { };
     };
 
-    hosts = mkOption {
-      type = types.attrsOf hostSubmodule;
-      default = { };
+    hosts = lib.mkOption {
+      type = lib.types.attrsOf hostSubmodule;
     };
-  };
-
-  config.private.pubKeys = {
-    common = rawTree.common or { };
-    hosts = rawTree.hosts or { };
   };
 }

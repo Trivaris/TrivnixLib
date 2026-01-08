@@ -5,6 +5,4 @@
     description = "Path to the secrets directory.";
     readOnly = true;
   };
-
-  config.private.secrets = ./secrets;
 }

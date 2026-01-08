@@ -67,6 +67,4 @@ in
     default = { };
     description = "Email accounts per user.";
   };
-
-  config.private.emailAccounts = import ./emailAccounts.nix;
 }
