@@ -27,7 +27,6 @@ let
     trivnixLib = self.lib;
     isNixos = true;
     inherit
-      hostInfos
       allHostInfos
       allHostPrefs
       allUserInfos
@@ -47,6 +46,7 @@ nixpkgs.lib.nixosSystem {
     hostConfig.hardware
     (importTree (selfArg + "/host"))
     { inherit hostPrefs; }
+    { inherit hostInfos; }
     { hostPrefs.stylix = hostConfig.stylix; }
     { disko.enableConfig = true; }
     {
@@ -73,6 +73,7 @@ nixpkgs.lib.nixosSystem {
             config = { inherit userPrefs; };
             imports = [
               self.nixosModules.default
+              self.homeManagerModules.stylixOptions
               {
                 _module.args = {
                   userInfos = hostConfig.users.${name}.infos;

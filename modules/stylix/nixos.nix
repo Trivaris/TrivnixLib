@@ -1,39 +1,5 @@
-{
-  lib,
-  config,
-  pkgs,
-  ...
-}:
-let
-  prefs = config.hostPrefs;
-  theme = "${pkgs.base16-schemes}/share/themes/${prefs.stylix.colorscheme}.yaml";
-in
+{ pkgs, config, lib, ... }:
 {
   options.hostPrefs.stylix = import ./options.nix lib;
-  config.stylix = {
-    enable = true;
-    base16Scheme = theme;
-    polarity = if prefs.stylix.darkmode then "dark" else "light";
-    targets.gtk.enable = true;
-
-    cursor = {
-      package = pkgs.${prefs.stylix.cursorPackage};
-      name = prefs.stylix.cursorName;
-      size = prefs.stylix.cursorSize;
-    };
-
-    fonts = {
-      serif = config.stylix.fonts.sansSerif;
-
-      monospace = {
-        name = "JetBrainsMono Nerd Font";
-        package = pkgs.nerd-fonts.jetbrains-mono;
-      };
-
-      sansSerif = {
-        name = prefs.stylix.nerdfont;
-        package = pkgs.nerd-fonts.${prefs.stylix.nerdfont};
-      };
-    };
-  };
+  config.stylix = import ./config.nix config.hostPrefs pkgs;
 }

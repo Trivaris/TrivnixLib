@@ -32,7 +32,14 @@
       };
 
       homeManagerModules = {
-        stylix = import ./modules/stylix/home.nix;
+        stylixOptions = import ./modules/stylix/homeOptions.nix;
+        stylixConfig = import ./modules/stylix/homeConfig.nix;
+        default = _: {
+          imports = [
+            self.homeManagerModules.stylixOptions
+            self.homeManagerModules.stylixConfig
+          ];
+        };
       };
     };
 }
