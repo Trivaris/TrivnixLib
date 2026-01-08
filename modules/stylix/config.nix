@@ -1,5 +1,4 @@
-prefs: pkgs:
-{
+prefs: pkgs: {
   enable = true;
   base16Scheme = prefs.stylix.theme;
   polarity = if prefs.stylix.darkmode then "dark" else "light";
