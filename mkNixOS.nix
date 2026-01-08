@@ -43,6 +43,7 @@ nixpkgs.lib.nixosSystem {
     home-manager.nixosModules.home-manager
     stylix.nixosModules.stylix
     self.nixosModules.default
+    self.nixosModules.stylix
     hostConfig.partitions
     hostConfig.hardware
     (importTree (selfArg + "/host"))
@@ -74,6 +75,7 @@ nixpkgs.lib.nixosSystem {
           users = nixpkgs.lib.mapAttrs (name: userPrefs: {
             config = { inherit userPrefs; };
             imports = [
+              self.nixosModules.default
               {
                 _module.args = {
                   userInfos = hostConfig.users.${name}.infos;

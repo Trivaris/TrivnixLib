@@ -22,7 +22,6 @@
         secrets = import ./modules/secrets.nix;
         default = _: {
           imports = [
-            self.nixosModules.stylix
             self.nixosModules.hostInfos
             self.nixosModules.calendarAccounts
             self.nixosModules.emailAccounts
@@ -34,11 +33,6 @@
 
       homeManagerModules = {
         stylix = import ./modules/stylix/home.nix;
-        default = _: {
-          imports = [
-            self.homeManagerModules.stylix
-          ];
-        };
       };
     };
 }
