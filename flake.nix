@@ -22,9 +22,9 @@
         pubKeys = import ./modules/pubKeys.nix;
         secrets = import ./modules/secrets.nix;
         stylix = _: {
-          import = [
-            self.stylixConfig
-            self.stylixOptions
+          imports = [
+            self.nixosModules.stylixConfig
+            self.nixosModules.stylixOptions
           ];
         };
         default = _: {
