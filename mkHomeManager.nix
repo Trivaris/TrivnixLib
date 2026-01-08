@@ -30,8 +30,7 @@ let
   allUserPrefs = collectAttrs "prefs" hostConfig.users;
 in
 home-manager.lib.homeManagerConfiguration {
-  extraSpecialArgs = extraArgs // {
-    isHomeManager = true;
+  extraSpecialArgs = {
     isNixos = false;
     trivnixLib = self.lib;
     inherit
