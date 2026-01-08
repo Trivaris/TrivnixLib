@@ -25,7 +25,6 @@ let
   
   specialArgs = {
     trivnixLib = self.lib;
-    isNixos = true;
     isHomeManager = false;
     inherit
       hostInfos
