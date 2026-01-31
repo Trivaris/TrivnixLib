@@ -24,6 +24,6 @@ in
 
     font = lib.mkPackageOption pkgs "nerd-fonts-jetbrains-mono" {
       default = [ "nerd-fonts" "jetbrains-mono" ];
-    }
+    };
   };
 }
