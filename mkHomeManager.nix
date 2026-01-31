@@ -32,6 +32,12 @@ let
   allUserPrefs = collectAttrs "prefs" hostConfig.users;
 in
 home-manager.lib.homeManagerConfiguration {
+  pkgs = import nixpkgs {
+    system = hostConfig.infos.architecture;
+    overlays = builtins.attrValues overlays;
+    config = hostConfig.pkgsConfig;
+  };
+
   extraSpecialArgs = {
     isNixos = false;
     trivnixLib = self.lib;
@@ -53,12 +59,5 @@ home-manager.lib.homeManagerConfiguration {
     { inherit hostInfos; }
     { inherit userInfos; }
     { inherit stylixPrefs; }
-    {
-      nixpkgs = {
-        system = hostConfig.infos.architecture;
-        overlays = builtins.attrValues overlays;
-        config = hostConfig.pkgsConfig;
-      };
-    }
   ];
 }
