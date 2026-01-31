@@ -37,6 +37,6 @@ in
     cursorName = lib.mkOption {
       type = lib.types.str;
       default = "BreezeX-RosePine-Linux";
-    }
+    };
   };
 }
