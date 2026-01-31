@@ -18,7 +18,7 @@ in
 
     kittyTheme = lib.mkOption {
       type = lib.types.str;
-      default = "catppuccin-mocha";
+      default = "Catppuccin-Mocha";
     };
 
     theme = lib.mkOption {
