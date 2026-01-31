@@ -5,7 +5,6 @@
     nixpkgs.url = "github:nixos/nixpkgs?ref=nixos-unstable";
     home-manager.url = "github:nix-community/home-manager";
     importTree.url = "github:vic/import-tree";
-    stylix.url = "github:danth/stylix";
   };
 
   outputs =
@@ -20,8 +19,6 @@
       } "yq '.palette' ${pkgs.base16-schemes}/share/themes/0x96f.yaml > $out" ));
 
       nixosModules = {
-        stylixConfig = import ./modules/stylix/config.nix;
-        stylixOptions = import ./modules/stylix/options.nix;
         hostInfos = import ./modules/hostInfos.nix;
         userInfos = import ./modules/userInfos.nix;
         calendarAccounts = import ./modules/calendarAccounts.nix;
@@ -29,12 +26,6 @@
         pubKeys = import ./modules/pubKeys.nix;
         secrets = import ./modules/secrets.nix;
         theming = import ./modules/theming.nix;
-        stylix = _: {
-          imports = [
-            self.nixosModules.stylixConfig
-            self.nixosModules.stylixOptions
-          ];
-        };
         default = _: {
           imports = [
             self.nixosModules.hostInfos

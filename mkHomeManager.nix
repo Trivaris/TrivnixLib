@@ -52,5 +52,6 @@ home-manager.lib.homeManagerConfiguration {
     { inherit userPrefs; }
     { inherit hostInfos; }
     { inherit userInfos; }
+    { themingPrefs = hostConfig.theming; }
   ];
 }

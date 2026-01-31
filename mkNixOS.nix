@@ -43,6 +43,7 @@ nixpkgs.lib.nixosSystem {
     (importTree (selfArg + "/host"))
     { inherit hostPrefs; }
     { inherit hostInfos; }
+    { themingPrefs = hostConfig.theming; }
     {
       nixpkgs = {
         system = hostConfig.infos.architecture;
@@ -61,6 +62,7 @@ nixpkgs.lib.nixosSystem {
             self.nixosModules.default
             (importTree (selfArg + "/home"))
             { inherit hostInfos; }
+            { themingPrefs = hostConfig.theming; }
           ];
 
           backupFileExtension = builtins.readFile (
