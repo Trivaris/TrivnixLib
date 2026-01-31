@@ -1,7 +1,6 @@
 {
   nixpkgs,
   home-manager,
-  stylix,
   importTree,
   self,
   ...
@@ -16,8 +15,6 @@ hostConfig:
 let
   hostPrefs = hostConfig.prefs;
   hostInfos = hostConfig.infos;
-
-  stylixPrefs = hostConfig.stylix;
 
   collectAttrs = attrName: attrs: nixpkgs.lib.mapAttrs (_: value: value.${attrName}) attrs;
   allHostInfos = collectAttrs "infos" configs;
@@ -40,15 +37,12 @@ nixpkgs.lib.nixosSystem {
 
   modules = modules.host ++ [
     home-manager.nixosModules.home-manager
-    # stylix.nixosModules.stylix
     self.nixosModules.default
-    # self.nixosModules.stylix
     hostConfig.partitions
     hostConfig.hardware
     (importTree (selfArg + "/host"))
     { inherit hostPrefs; }
     { inherit hostInfos; }
-    # { inherit stylixPrefs; }
     {
       nixpkgs = {
         system = hostConfig.infos.architecture;
@@ -65,10 +59,8 @@ nixpkgs.lib.nixosSystem {
           extraSpecialArgs = specialArgs;
           sharedModules = modules.home ++ [
             self.nixosModules.default
-            # self.nixosModules.stylixOptions
             (importTree (selfArg + "/home"))
             { inherit hostInfos; }
-            # { inherit stylixPrefs; }
           ];
 
           backupFileExtension = builtins.readFile (
