@@ -39,7 +39,6 @@ home-manager.lib.homeManagerConfiguration {
   };
 
   extraSpecialArgs = {
-    isNixos = false;
     trivnixLib = self.lib;
     inherit
       hostPrefs
@@ -51,13 +50,13 @@ home-manager.lib.homeManagerConfiguration {
   };
 
   modules = modules.home ++ [
-    self.nixosModules.stylix
     self.nixosModules.default
-    stylix.homeManagerModules.default
+    # self.nixosModules.stylix
+    # stylix.homeManagerModules.default
     (importTree (selfArg + "/home"))
     { inherit userPrefs; }
     { inherit hostInfos; }
     { inherit userInfos; }
-    { inherit stylixPrefs; }
+    # { inherit stylixPrefs; }
   ];
 }

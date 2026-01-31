@@ -27,7 +27,6 @@ let
 
   specialArgs = {
     trivnixLib = self.lib;
-    isNixos = true;
     inherit
       allHostInfos
       allHostPrefs
@@ -41,15 +40,15 @@ nixpkgs.lib.nixosSystem {
 
   modules = modules.host ++ [
     home-manager.nixosModules.home-manager
-    stylix.nixosModules.stylix
+    # stylix.nixosModules.stylix
     self.nixosModules.default
-    self.nixosModules.stylix
+    # self.nixosModules.stylix
     hostConfig.partitions
     hostConfig.hardware
     (importTree (selfArg + "/host"))
     { inherit hostPrefs; }
     { inherit hostInfos; }
-    { inherit stylixPrefs; }
+    # { inherit stylixPrefs; }
     {
       nixpkgs = {
         system = hostConfig.infos.architecture;
@@ -66,10 +65,10 @@ nixpkgs.lib.nixosSystem {
           extraSpecialArgs = specialArgs;
           sharedModules = modules.home ++ [
             self.nixosModules.default
-            self.nixosModules.stylixOptions
+            # self.nixosModules.stylixOptions
             (importTree (selfArg + "/home"))
             { inherit hostInfos; }
-            { inherit stylixPrefs; }
+            # { inherit stylixPrefs; }
           ];
 
           backupFileExtension = builtins.readFile (
