@@ -13,7 +13,12 @@ in
 
     themeName = lib.mkOption {
       type = lib.types.str;
-      default = "catppuccin-frappe";
+      default = "catppuccin-mocha";
+    };
+
+    kittyThemeName = lib.mkOption {
+      type = lib.types.str;
+      default = "catppuccin-mocha";
     };
 
     theme = lib.mkOption {
