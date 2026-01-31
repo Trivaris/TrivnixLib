@@ -16,7 +16,7 @@ in
       default = "catppuccin-mocha";
     };
 
-    kittyThemeName = lib.mkOption {
+    kittyTheme = lib.mkOption {
       type = lib.types.str;
       default = "catppuccin-mocha";
     };
