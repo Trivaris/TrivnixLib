@@ -9,7 +9,7 @@ let
 in 
 {
   options.themingPrefs = {
-    dark = lib.mkEnableOption "Enable Dark Mode";
+    darkmode = lib.mkEnableOption "Enable Dark Mode";
 
     themeName = lib.mkOption {
       type = lib.types.str;
