@@ -15,7 +15,7 @@ in
     };
 
     theme = lib.mkOption {
-      type = lib.types.attrsOf lib.types.strMatching "^#[a-f|A-F|0-9]{6,6}$";
+      type = lib.types.attrsOf (lib.types.strMatching "^#[a-f|A-F|0-9]{6,6}$");
       description = "";
       default = builtins.fromJSON (builtins.readFile (pkgs.runCommand "load-scheme" {
           nativeBuildInputs = [ pkgs.yq pkgs.base16-schemes ];
