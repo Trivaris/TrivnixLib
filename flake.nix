@@ -13,10 +13,34 @@
       pkgs = import nixpkgs { system = "x86_64-linux"; };
     in
     {
-      lib = import ./lib.nix inputs;
-      test = builtins.fromJSON (builtins.readFile (pkgs.runCommand "load-scheme" {
-        nativeBuildInputs = [ pkgs.yq pkgs.base16-schemes ];
-      } "yq '.palette' ${pkgs.base16-schemes}/share/themes/0x96f.yaml > $out" ));
+      overlays.default = _: prev: {
+        lib = prev.lib.extend (lself: lsuper: {
+          getModules =
+            path:
+            builtins.attrNames (
+              removeAttrs (nixpkgs.lib.packagesFromDirectoryRecursive {
+                directory = path;
+                callPackage = (x: _: x);
+              }) [ "default" ]
+            );
+
+          recursiveAttrValues =
+            attrs:
+            nixpkgs.lib.pipe attrs [
+              builtins.attrValues
+              (map (value: if nixpkgs.lib.isAttrs value then self.lib.recursiveAttrValues value else [ value ]))
+              builtins.concatLists
+            ];
+          
+          mkReverseProxyOption = import ./mkReverseProxyOption.nix {
+            inherit (nixpkgs.lib) types mkOption mkEnableOption;
+          };
+
+
+          mkHomeManager = import ./mkHomeManager.nix inputs;
+          mkNixOS = import ./mkNixOS.nix inputs;
+        })
+      };
 
       nixosModules = {
         hostInfos = import ./modules/hostInfos.nix;

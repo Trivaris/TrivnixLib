@@ -31,12 +31,11 @@ in
 home-manager.lib.homeManagerConfiguration {
   pkgs = import nixpkgs {
     system = hostConfig.infos.architecture;
-    overlays = builtins.attrValues overlays;
+    overlays = (builtins.attrValues overlays) ++ self.overlays.default;
     config = hostConfig.pkgsConfig;
   };
 
   extraSpecialArgs = {
-    trivnixLib = self.lib;
     inherit
       hostPrefs
       allHostInfos
