@@ -8,7 +8,8 @@
 {
   overlays,
   configs,
-  modules,
+  nixosModules,
+  homeModules,
   selfArg,
 }:
 hostConfig:
@@ -35,7 +36,7 @@ in
 nixpkgs.lib.nixosSystem {
   inherit specialArgs;
 
-  modules = modules.host ++ [
+  modules = nixosModules ++ [
     home-manager.nixosModules.home-manager
     self.nixosModules.default
     hostConfig.partitions
@@ -58,7 +59,7 @@ nixpkgs.lib.nixosSystem {
           useGlobalPkgs = true;
           useUserPackages = true;
           extraSpecialArgs = specialArgs;
-          sharedModules = modules.home ++ [
+          sharedModules = homeModules ++ [
             self.nixosModules.default
             (importTree (selfArg + "/home"))
             { inherit hostInfos; }

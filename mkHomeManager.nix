@@ -8,7 +8,7 @@
 {
   overlays,
   configs,
-  modules,
+  homeModules,
   selfArg,
 }:
 {
@@ -46,7 +46,7 @@ home-manager.lib.homeManagerConfiguration {
       ;
   };
 
-  modules = modules.home ++ [
+  modules = homeModules ++ [
     self.nixosModules.default
     (importTree (selfArg + "/home"))
     { inherit userPrefs; }

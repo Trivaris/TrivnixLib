@@ -10,23 +10,30 @@ in
 {
   options.themingPrefs = {
     darkmode = lib.mkEnableOption "Enable Dark Mode";
-
-    themeName = lib.mkOption {
-      type = lib.types.str;
-      default = "catppuccin-mocha";
-    };
-
-    kittyTheme = lib.mkOption {
-      type = lib.types.str;
-      default = "Catppuccin-Mocha";
-    };
-
+    
     theme = lib.mkOption {
       type = lib.types.attrsOf (lib.types.strMatching "^#[a-f|A-F|0-9]{6,6}$");
       description = "";
       default = builtins.fromJSON (builtins.readFile (pkgs.runCommand "load-scheme" {
         nativeBuildInputs = [ pkgs.yq pkgs.base16-schemes ];
       } "yq '.palette' ${pkgs.base16-schemes}/share/themes/${prefs.themeName}.yaml > $out" ));
+    };
+
+    themePackages = {
+
+
+    };
+
+    schemes = {
+      general = lib.mkOption {
+        type = lib.types.str;
+        default = "catppuccin-mocha";
+      };
+
+      kitty = lib.mkOption {
+        type = lib.types.str;
+        default = "Catppuccin-Mocha";
+      };
     };
 
     font = lib.mkOption {
