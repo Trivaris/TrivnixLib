@@ -27,6 +27,9 @@ in
           };
         };
       };
+      default = {
+        spicetify = pkgs.spicePkgs.themes.catppuccin;
+      };
     };
 
     schemes = lib.mkOption {
