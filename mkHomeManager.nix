@@ -46,7 +46,7 @@ home-manager.lib.homeManagerConfiguration {
       ;
   };
 
-  modules = homeModules ++ [
+  modules = (builtins.attrValues homeModules) ++ [
     self.nixosModules.default
     (importTree (selfArg + "/home"))
     { inherit userPrefs; }

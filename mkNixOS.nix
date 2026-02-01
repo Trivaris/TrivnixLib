@@ -36,7 +36,7 @@ in
 nixpkgs.lib.nixosSystem {
   inherit specialArgs;
 
-  modules = nixosModules ++ [
+  modules = (builtins.attrValues nixosModules) ++ [
     home-manager.nixosModules.home-manager
     self.nixosModules.default
     hostConfig.partitions
@@ -59,7 +59,7 @@ nixpkgs.lib.nixosSystem {
           useGlobalPkgs = true;
           useUserPackages = true;
           extraSpecialArgs = specialArgs;
-          sharedModules = homeModules ++ [
+          sharedModules = (builtins.attrValues homeModules) ++ [
             self.nixosModules.default
             (importTree (selfArg + "/home"))
             { inherit hostInfos; }
