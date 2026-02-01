@@ -39,7 +39,7 @@ in
       spicetify = lib.mkOption {
         type = lib.types.str;
         default = "mocha";
-      }
+      };
     };
 
     cursor = {
