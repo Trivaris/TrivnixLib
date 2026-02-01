@@ -19,9 +19,10 @@ in
       } "yq '.palette' ${pkgs.base16-schemes}/share/themes/${prefs.themeName}.yaml > $out" ));
     };
 
-    themePackages = {
-
-
+    themes = {
+      spicetify = lib.mkPackageOption pkgs "SpicetifyTheme" {
+        default = [ "spicePkgs" "themes" "catppuccin" ];
+      };
     };
 
     schemes = {
@@ -34,21 +35,27 @@ in
         type = lib.types.str;
         default = "Catppuccin-Mocha";
       };
+
+      spicetify = lib.mkOption {
+        type = lib.types.str;
+        default = "mocha";
+      }
+    };
+
+    cursor = {
+      package = lib.mkPackageOption pkgs "Cursors" {
+        default = [ "rose-pine-cursor" ];
+      };
+
+      name = lib.mkOption {
+        type = lib.types.str;
+        default = "BreezeX-RosePine-Linux";
+      };
     };
 
     font = lib.mkOption {
       type = lib.types.functionTo lib.types.package;
       default = optPkgs: optPkgs.nerd-fonts.jetbrains-mono;
-    };
-
-    cursorPackage = lib.mkOption {
-      type = lib.types.functionTo lib.types.package;
-      default = optPkgs: optPkgs.rose-pine-cursor;
-    };
-
-    cursorName = lib.mkOption {
-      type = lib.types.str;
-      default = "BreezeX-RosePine-Linux";
     };
   };
 }
