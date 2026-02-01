@@ -31,33 +31,46 @@ in
 
     schemes = lib.mkOption {
       type = lib.types.submodule {
-        general = lib.mkOption {
-          type = lib.types.str;
-          default = "catppuccin-mocha";
-        };
+        options = {
+          general = lib.mkOption {
+            type = lib.types.str;
+            default = "catppuccin-mocha";
+          };
 
-        kitty = lib.mkOption {
-          type = lib.types.str;
-          default = "Catppuccin-Mocha";
-        };
+          kitty = lib.mkOption {
+            type = lib.types.str;
+            default = "Catppuccin-Mocha";
+          };
 
-        spicetify = lib.mkOption {
-          type = lib.types.str;
-          default = "mocha";
+          spicetify = lib.mkOption {
+            type = lib.types.str;
+            default = "mocha";
+          };
         };
+      };
+      default = {
+        general = "catppuccin-mocha";
+        kitty = "Catppuccin-Mocha";
+        spicetify = "mocha";
       };
     };
 
     cursor = lib.mkOption {
       type = lib.types.submodule {
-        package = lib.mkPackageOption pkgs "Cursors" {
-          default = [ "rose-pine-cursor" ];
-        };
+        options = {
+          package = lib.mkPackageOption pkgs "Cursors" {
+            default = [ "rose-pine-cursor" ];
+          };
 
-        name = lib.mkOption {
-          type = lib.types.str;
-          default = "BreezeX-RosePine-Linux";
+          name = lib.mkOption {
+            type = lib.types.str;
+            default = "BreezeX-RosePine-Linux";
+          };
         };
+      };
+      default = {
+        package = pkgs.rose-pine-cursor;
+        name = "BreezeX-RosePine-Linux";
       };
     };
 
