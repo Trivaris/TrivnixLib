@@ -26,7 +26,7 @@ in
             default = [ "spicePkgs" "themes" "catppuccin" ];
           };
         };
-      }
+      };
     };
 
     schemes = lib.mkOption {
