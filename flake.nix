@@ -52,6 +52,7 @@
           imports = [
             self.homeModules.userInfos
             self.homeModules.secrets
+            self.nixosModules.pubKeys
             self.homeModules.emailAccounts
             self.homeModules.calendarAccounts
           ];
