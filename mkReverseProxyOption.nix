@@ -2,6 +2,7 @@
   mkOption,
   types,
   mkEnableOption,
+  ...
 }:
 { defaultPort }:
 mkOption {
