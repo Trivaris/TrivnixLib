@@ -90,7 +90,7 @@ in
       default = {
         package = pkgs.nerd-fonts.jetbrains-mono;
         name = "JetBrains Mono";
-      }
+      };
     };
   };
 }
