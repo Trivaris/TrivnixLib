@@ -29,8 +29,6 @@
 
       nixosModules = {
         hostInfos = import ./modules/hostInfos.nix;
-        calendarAccounts = import ./modules/calendarAccounts.nix;
-        emailAccounts = import ./modules/emailAccounts.nix;
         pubKeys = import ./modules/pubKeys.nix;
         secrets = import ./modules/secrets.nix;
         theming = import ./modules/theming.nix;
@@ -46,6 +44,20 @@
         };
       };
 
-      homeModules.default = import ./modules/userInfos.nix;
+      homeModules = {
+        userInfos = import ./modules/userInfos.nix;
+        secrets = import ./modules/secrets.nix;
+        pubKeys = import ./modules/pubKeys.nix;
+        emailAccounts = import ./modules/emailAccounts.nix;
+        calendarAccounts = import ./modules/calendarAccounts.nix;
+        default = _: {
+          imports = [
+            self.homeModules.userInfos
+            self.homeModules.secrets
+            self.homeModules.emailAccounts
+            self.homeModules.calendarAccounts
+          ]
+        }
+      };
     };
 }
