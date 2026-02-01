@@ -20,7 +20,7 @@ in
     };
 
     themes = lib.mkOption {
-      type = lib.types.submodule; {
+      type = lib.types.submodule {
         options = {
           spicetify = lib.mkPackageOption pkgs "SpicetifyTheme" {
             default = [ "spicePkgs" "themes" "catppuccin" ];
