@@ -11,12 +11,12 @@ in
   options.themingPrefs = {
     darkmode = lib.mkEnableOption "Enable Dark Mode";
     
-    theme = lib.mkOption {
+    scheme = lib.mkOption {
       type = lib.types.attrsOf (lib.types.strMatching "^#[a-f|A-F|0-9]{6,6}$");
       description = "";
       default = builtins.fromJSON (builtins.readFile (pkgs.runCommand "load-scheme" {
         nativeBuildInputs = [ pkgs.yq pkgs.base16-schemes ];
-      } "yq '.palette' ${pkgs.base16-schemes}/share/themes/${prefs.themeName}.yaml > $out" ));
+      } "yq '.palette' ${pkgs.base16-schemes}/share/themes/${prefs.schemes.general}.yaml > $out" ));
     };
 
     themes = lib.mkOption {
