@@ -35,8 +35,6 @@
         default = _: {
           imports = [
             self.nixosModules.hostInfos
-            self.nixosModules.calendarAccounts
-            self.nixosModules.emailAccounts
             self.nixosModules.pubKeys
             self.nixosModules.secrets
             self.nixosModules.theming
