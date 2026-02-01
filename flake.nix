@@ -56,8 +56,8 @@
             self.homeModules.secrets
             self.homeModules.emailAccounts
             self.homeModules.calendarAccounts
-          ]
-        }
+          ];
+        };
       };
     };
 }
