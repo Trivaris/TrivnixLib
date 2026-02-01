@@ -29,7 +29,6 @@
 
       nixosModules = {
         hostInfos = import ./modules/hostInfos.nix;
-        userInfos = import ./modules/userInfos.nix;
         calendarAccounts = import ./modules/calendarAccounts.nix;
         emailAccounts = import ./modules/emailAccounts.nix;
         pubKeys = import ./modules/pubKeys.nix;
@@ -38,7 +37,6 @@
         default = _: {
           imports = [
             self.nixosModules.hostInfos
-            self.nixosModules.userInfos
             self.nixosModules.calendarAccounts
             self.nixosModules.emailAccounts
             self.nixosModules.pubKeys
@@ -47,5 +45,7 @@
           ];
         };
       };
+
+      homeModules.default = import ./modules/userInfos.nix;
     };
 }
