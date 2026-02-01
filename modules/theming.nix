@@ -19,37 +19,45 @@ in
       } "yq '.palette' ${pkgs.base16-schemes}/share/themes/${prefs.themeName}.yaml > $out" ));
     };
 
-    themes = {
-      spicetify = lib.mkPackageOption pkgs "SpicetifyTheme" {
-        default = [ "spicePkgs" "themes" "catppuccin" ];
+    themes = lib.mkOption {
+      type = lib.types.submodule; {
+        options = {
+          spicetify = lib.mkPackageOption pkgs "SpicetifyTheme" {
+            default = [ "spicePkgs" "themes" "catppuccin" ];
+          };
+        };
+      }
+    };
+
+    schemes = lib.mkOption {
+      type = lib.types.submodule {
+        general = lib.mkOption {
+          type = lib.types.str;
+          default = "catppuccin-mocha";
+        };
+
+        kitty = lib.mkOption {
+          type = lib.types.str;
+          default = "Catppuccin-Mocha";
+        };
+
+        spicetify = lib.mkOption {
+          type = lib.types.str;
+          default = "mocha";
+        };
       };
     };
 
-    schemes = {
-      general = lib.mkOption {
-        type = lib.types.str;
-        default = "catppuccin-mocha";
-      };
+    cursor = lib.mkOption {
+      type = lib.types.submodule {
+        package = lib.mkPackageOption pkgs "Cursors" {
+          default = [ "rose-pine-cursor" ];
+        };
 
-      kitty = lib.mkOption {
-        type = lib.types.str;
-        default = "Catppuccin-Mocha";
-      };
-
-      spicetify = lib.mkOption {
-        type = lib.types.str;
-        default = "mocha";
-      };
-    };
-
-    cursor = {
-      package = lib.mkPackageOption pkgs "Cursors" {
-        default = [ "rose-pine-cursor" ];
-      };
-
-      name = lib.mkOption {
-        type = lib.types.str;
-        default = "BreezeX-RosePine-Linux";
+        name = lib.mkOption {
+          type = lib.types.str;
+          default = "BreezeX-RosePine-Linux";
+        };
       };
     };
 
