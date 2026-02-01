@@ -75,9 +75,22 @@ in
     };
 
     font = lib.mkOption {
-      type = lib.mkPackageOption pkgs "SpicetifyTheme" {
-        default = [ "nerd-fonts" "jetbrains-mono" ];
+      type = lib.types.submodule {
+        options = {
+          package = lib.mkPackageOption pkgs "SpicetifyTheme" {
+            default = [ "nerd-fonts" "jetbrains-mono" ];
+          };
+
+          name = lib.mkOption {
+            type = lib.types.str;
+            default = "JetBrains Mono";
+          };
+        };
       };
+      default = {
+        package = pkgs.nerd-fonts.jetbrains-mono;
+        name = "JetBrains Mono";
+      }
     };
   };
 }
