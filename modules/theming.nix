@@ -13,75 +13,54 @@ in
     
     scheme = lib.mkOption {
       type = lib.types.attrsOf (lib.types.strMatching "^#[a-f|A-F|0-9]{6,6}$");
-      description = "";
       default = builtins.fromJSON (builtins.readFile (pkgs.runCommand "load-scheme" {
         nativeBuildInputs = [ pkgs.yq pkgs.base16-schemes ];
-      } "yq '.palette' ${pkgs.base16-schemes}/share/themes/${prefs.schemes.general}.yaml > $out" ));
+      } "yq '.palette' ${pkgs.base16-schemes}/share/themes/${prefs.schemeName}.yaml > $out" ));
     };
 
-    themes = lib.mkOption {
+    schemeName = lib.mkOption {
+      type = lib.types.str;
+    };
+
+    themeOverrides = lib.mkOption {
       type = lib.types.submodule {
         options = {
           spicetify = lib.mkOption {
-            type = lib.types.attrs;
-            default = pkgs.spicePkgs.themes.catppuccin;
+            type = lib.types.nullOr (lib.types.submodule {
+              options = {
+                package = lib.mkOption {
+                  type = lib.types.nullOr lib.types.attrs;
+                  default = pkgs.spicePkgs.themes.catppuccin;
+                };
+                scheme = lib.mkOption {
+                  type = lib.types.str;
+                  default = "mocha";
+                };
+              };
+            });
+            example = {
+              package = pkgs.spicePkgs.themes.catppuccin;
+              scheme = "mocha";
+            };
+            default = null;
           };
-        };
-      };
-      default = {
-        spicetify = pkgs.spicePkgs.themes.catppuccin;
-      };
-    };
-
-    schemes = lib.mkOption {
-      type = lib.types.submodule {
-        options = {
-          general = lib.mkOption {
-            type = lib.types.str;
-            default = "catppuccin-mocha";
-          };
-
           kitty = lib.mkOption {
-            type = lib.types.str;
-            default = "Catppuccin-Mocha";
-          };
-
-          spicetify = lib.mkOption {
-            type = lib.types.str;
-            default = "mocha";
+            type = lib.types.nullOr lib.types.str;
+            example = "${pkgs.kitty-themes}/share/kitty-themes/themes/Catppuccin-Mocha.conf";
+            default = null;
           };
         };
       };
       default = {
-        general = "catppuccin-mocha";
-        kitty = "Catppuccin-Mocha";
-        spicetify = "mocha";
-      };
-    };
-
-    cursor = lib.mkOption {
-      type = lib.types.submodule {
-        options = {
-          package = lib.mkPackageOption pkgs "Cursors" {
-            default = [ "rose-pine-cursor" ];
-          };
-
-          name = lib.mkOption {
-            type = lib.types.str;
-            default = "BreezeX-RosePine-Linux";
-          };
-        };
-      };
-      default = {
-        package = pkgs.rose-pine-cursor;
-        name = "BreezeX-RosePine-Linux";
+        spicetify = null;
+        kitty = null;
       };
     };
 
     font = lib.mkOption {
       type = lib.types.submodule {
         options = {
-          package = lib.mkPackageOption pkgs "SpicetifyTheme" {
+          package = lib.mkPackageOption pkgs "Font" {
             default = [ "nerd-fonts" "jetbrains-mono" ];
           };
 
