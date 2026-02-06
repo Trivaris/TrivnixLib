@@ -23,7 +23,7 @@
               builtins.concatLists
             ];
           
-          mkReverseProxyOption = import ./mkReverseProxyOption.nix prev;
+          mkReverseProxyOption = import ./mkReverseProxyOption.nix prev.lib;
         });
       };
 
