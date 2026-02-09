@@ -27,6 +27,11 @@ in
             refreshRate = mkStrOption "The refresh rate of the monitor.";
             position = mkStrOption "The position of the monitor in the layout.";
             scaling = mkStrOption "The scaling factor for the monitor.";
+            workspaceIndex = lib.mkOption {
+              type = lib.types.int;
+              default = 0;
+              description = "0 for workspaces 1-10, 1 for workspaces 11-20, etc.";
+            };
             wallpaper = lib.mkOption {
               type = lib.types.path;
               description = "The wallpaper path for the monitor.";
