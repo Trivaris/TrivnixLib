@@ -4,7 +4,7 @@
   outputs =
     { self }:
     {
-      overlays.default = _: prev: {
+      overlays.default = final: prev: {
         lib = prev.lib.extend (lself: lsuper: {
           getModules =
             path:
@@ -19,7 +19,7 @@
             attrs:
             prev.pipe attrs [
               builtins.attrValues
-              (map (value: if prev.isAttrs value then self.lib.recursiveAttrValues value else [ value ]))
+              (map (value: if prev.isAttrs value then final.lib.recursiveAttrValues value else [ value ]))
               builtins.concatLists
             ];
           
