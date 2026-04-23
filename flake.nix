@@ -32,12 +32,14 @@
         pubKeys = import ./modules/pubKeys.nix;
         secrets = import ./modules/secrets.nix;
         theming = import ./modules/theming.nix;
+        cfddns = import ./modules/cfddns.nix;
         default = _: {
           imports = [
             self.nixosModules.hostInfos
             self.nixosModules.pubKeys
             self.nixosModules.secrets
             self.nixosModules.theming
+            self.nixosModules.cfddns
           ];
         };
       };

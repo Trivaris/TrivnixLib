@@ -1,4 +1,4 @@
-{ lib, config, ... }:
+{ lib, ... }:
 {
   options.private.secrets = lib.mkOption {
     type = lib.types.path;

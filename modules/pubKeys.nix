@@ -1,4 +1,4 @@
-{ lib, config, ... }:
+{ lib, ... }:
 let
 
   keyType = lib.types.path;
