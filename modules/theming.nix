@@ -61,12 +61,15 @@ in
       type = lib.types.submodule {
         options = {
           package = lib.mkPackageOption pkgs "Font" {
-            default = [ "nerd-fonts" "jetbrains-mono" ];
+            default = [ "nerd-fonts" "roboto-mono" ];
           };
-
-          name = lib.mkOption {
+          monoName = lib.mkOption {
             type = lib.types.str;
-            default = "JetBrains Mono";
+            default = "RobotoMono Nerd Font Mono";
+          };
+          propoName = lib.mkOption {
+            type = lib.types.str;
+            default = "RobotoMono Nerd Font Propo";
           };
         };
       };
