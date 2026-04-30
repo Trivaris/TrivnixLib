@@ -1,14 +1,9 @@
-{ lib, config, ... }:
+{ lib, ... }:
 let
   inherit (lib) mkOption types;
 
   calendarSubmodule = types.submodule {
     options = {
-      type = mkOption {
-        type = types.enum [ "caldav" ];
-        default = "caldav";
-        description = "Type of calendar resource.";
-      };
       uri = mkOption {
         type = types.str;
         description = "URI for the calendar.";
