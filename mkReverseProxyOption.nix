@@ -31,7 +31,7 @@ mkOption {
       };
     };
   };
-  
+
   default = {
     enable = false;
     port = defaultPort;
