@@ -81,7 +81,7 @@
           shellHook = ''
             mkdir -p ./.vscode/
             rm -rf ./.vscode/settings.json
-            ln -s ${self.packages.${system}.vscode-settings-kotlin} ./.vscode/settings.json
+            ln -s ${self.packages.${system}.vscode-settings-java} ./.vscode/settings.json
           '';
         };
 
@@ -104,7 +104,7 @@
           shellHook = ''
             mkdir -p ./.vscode/
             rm -rf ./.vscode/settings.json
-            ln -s ${self.packages.${system}.vscode-settings-java} ./.vscode/settings.json
+            ln -s ${self.packages.${system}.vscode-settings-kotlin} ./.vscode/settings.json
 
             export LD_LIBRARY_PATH=${pkgs.lib.makeLibraryPath [ pkgs.xorg.libXtst pkgs.libxxf86vm pkgs.glib pkgs.gtk3 pkgs.libGL]}:$LD_LIBRARY_PATH
           '';
