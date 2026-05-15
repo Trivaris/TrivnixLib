@@ -84,6 +84,31 @@
             ln -s ${self.packages.${system}.vscode-settings-java} ./.vscode/settings.json
           '';
         };
+
+        kotlin = pkgs.mkShell {
+          buildInputs = [
+            pkgs.python314
+            pkgs.gradle_9
+            pkgs.kotlin
+            pkgs.kotlin-language-server
+            jdk
+
+            pkgs.libxxf86vm
+            pkgs.libXtst
+            pkgs.glib
+            pkgs.gtk3
+            pkgs.libGL
+            pkgs.tailwindcss
+          ];
+
+          shellHook = ''
+            mkdir -p ./.vscode/
+            rm -rf ./.vscode/settings.json
+            ln -s ${self.packages.${system}.vscode-settings-java} ./.vscode/settings.json
+
+            export LD_LIBRARY_PATH=${pkgs.lib.makeLibraryPath [ pkgs.xorg.libXtst pkgs.libxxf86vm pkgs.glib pkgs.gtk3 pkgs.libGL]}:$LD_LIBRARY_PATH
+          '';
+        };
       };
 
       packages.${system} = {
