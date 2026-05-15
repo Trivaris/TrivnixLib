@@ -94,7 +94,7 @@
             jdk
 
             pkgs.libxxf86vm
-            pkgs.libXtst
+            pkgs.libxtst
             pkgs.glib
             pkgs.gtk3
             pkgs.libGL
