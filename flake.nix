@@ -106,7 +106,15 @@
             rm -rf ./.vscode/settings.json
             ln -s ${self.packages.${system}.vscode-settings-kotlin} ./.vscode/settings.json
 
-            export LD_LIBRARY_PATH=${pkgs.lib.makeLibraryPath [ pkgs.xorg.libXtst pkgs.libxxf86vm pkgs.glib pkgs.gtk3 pkgs.libGL]}:$LD_LIBRARY_PATH
+            export LD_LIBRARY_PATH=${
+              pkgs.lib.makeLibraryPath [
+                pkgs.xorg.libXtst
+                pkgs.libxxf86vm
+                pkgs.glib
+                pkgs.gtk3
+                pkgs.libGL
+              ]
+            }:$LD_LIBRARY_PATH
           '';
         };
       };
@@ -132,28 +140,28 @@
           pkgs.runCommand "settings.json" {
             nativeBuildInputs = [ pkgs.jq ];
           } "jq . ${rawSettings} > $out";
-      };
 
-      vscode-settings-kotlin =
-        let
-          rawSettings = pkgs.writeText "settings.json" (
-            builtins.toJSON {
-              "java.compile.nullAnalysis.mode" = "automatic";
-              "java.configuration.updateBuildConfiguration" = "interactive";
-              "java.jdt.ls.java.home" = jdk.home;
-              "kotlin.java.home" = jdk.home;
-              "java.configuration.runtimes" = [
-                {
-                  name = "JavaSE-${builtins.head (builtins.splitVersion jdk.version)}";
-                  path = "${jdk.home}";
-                  default = true;
-                }
-              ];
-            }
-          );
-        in
-        pkgs.runCommand "settings.json" {
-          nativeBuildInputs = [ pkgs.jq ];
-        } "jq . ${rawSettings} > $out";
-  };
+        vscode-settings-kotlin =
+          let
+            rawSettings = pkgs.writeText "settings.json" (
+              builtins.toJSON {
+                "java.compile.nullAnalysis.mode" = "automatic";
+                "java.configuration.updateBuildConfiguration" = "interactive";
+                "java.jdt.ls.java.home" = jdk.home;
+                "kotlin.java.home" = jdk.home;
+                "java.configuration.runtimes" = [
+                  {
+                    name = "JavaSE-${builtins.head (builtins.splitVersion jdk.version)}";
+                    path = "${jdk.home}";
+                    default = true;
+                  }
+                ];
+              }
+            );
+          in
+          pkgs.runCommand "settings.json" {
+            nativeBuildInputs = [ pkgs.jq ];
+          } "jq . ${rawSettings} > $out";
+      };
+    };
 }
