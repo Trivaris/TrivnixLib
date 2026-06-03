@@ -4,7 +4,6 @@
   mkEnableOption,
   ...
 }:
-{ defaultPort }:
 mkOption {
   description = "List of services with name, ports, and domain.";
 
@@ -14,7 +13,6 @@ mkOption {
 
       port = mkOption {
         type = types.port;
-        default = defaultPort;
         description = "Internal service port.";
       };
 
@@ -30,11 +28,5 @@ mkOption {
         description = "Optional external port for the service. Only used if reverse Proxy is enabled, otherwise config.port is used";
       };
     };
-  };
-
-  default = {
-    enable = false;
-    port = defaultPort;
-    externalPort = null;
   };
 }
