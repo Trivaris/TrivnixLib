@@ -11,7 +11,8 @@
       jdk = pkgs.jdk21;
     in
     {
-      overlays.default = final: prev: {
+      overlays.default = final: prev:
+      {
         lib = prev.lib.extend (
           lself: lsuper: {
             getModules =
@@ -31,6 +32,7 @@
                 builtins.concatLists
               ];
 
+            reverseProxyOptions = import ./reverseProxyOptions.nix prev.lib;
             mkReverseProxyOption = import ./mkReverseProxyOption.nix prev.lib;
           }
         );
