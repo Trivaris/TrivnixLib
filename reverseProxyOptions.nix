@@ -30,5 +30,7 @@
       default = 443;
       description = "External port for the service.";
     };
+
+    https = mkEnableOption "Routing through https behind the reverse proxy for service";
   };
 }
