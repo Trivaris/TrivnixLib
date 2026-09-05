@@ -6,7 +6,8 @@
 }:
 {
   options = {
-    enable = mkEnableOption "Wether to enable to the reverse Proxy.";
+    enable = mkEnableOption "Reverse Proxy";
+    disableAnubis = mkEnableOption "Disable Anubis";
 
     address = mkOption {
       type = types.str;
