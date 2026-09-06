@@ -1,7 +1,7 @@
 {
   description = "Trivnix Helpers and Utilities";
 
-  inputs.nixpkgs.url = "github:nixos/nixpkgs?ref=nixos-25.11";
+  inputs.nixpkgs.url = "github:nixos/nixpkgs?ref=nixos-unstable";
 
   outputs =
     { self, nixpkgs }:
