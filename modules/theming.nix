@@ -83,6 +83,10 @@ in
             type = lib.types.str;
             default = "RobotoMono Nerd Font Propo";
           };
+          extraFonts = lib.mkOption {
+            type = lib.types.listOf lib.types.package;
+            default = [ ];
+          };
         };
       };
       default = {
