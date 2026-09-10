@@ -41,6 +41,7 @@
       nixosModules = {
         hostInfos = import ./modules/hostInfos.nix;
         pubKeys = import ./modules/pubKeys.nix;
+        wgPeers = import ./modules/wgPeers.nix;
         secrets = import ./modules/secrets.nix;
         theming = import ./modules/theming.nix;
         default = _: {
@@ -49,6 +50,7 @@
             self.nixosModules.pubKeys
             self.nixosModules.secrets
             self.nixosModules.theming
+            self.nixosModules.wgPeers
           ];
         };
       };

@@ -13,12 +13,7 @@ let
     options = {
       ssh = lib.mkOption {
         type = lib.types.attrsOf keyType;
-        description = "Common SSH keys";
-        default = { };
-      };
-      wireguard = lib.mkOption {
-        type = lib.types.attrsOf keyType;
-        description = "Common SSH keys";
+        description = "Guest SSH keys";
         default = { };
       };
     };
@@ -28,7 +23,6 @@ let
   hostSubmodule = lib.types.submodule {
     options = {
       "host.pub" = keyOption;
-      "wireguard.pub" = keyOption;
 
       users = lib.mkOption {
         description = "User keys for this host";
