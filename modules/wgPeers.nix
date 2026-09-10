@@ -4,6 +4,7 @@ let
     options = {
       key = lib.mkOption { type = lib.types.path; };
       id = lib.mkOption { type = lib.types.int; };
+      endpoint = lib.mkOption { type = lib.types.nullOr lib.types.str; };
     };
   };
 in 
