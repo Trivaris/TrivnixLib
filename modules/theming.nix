@@ -25,12 +25,8 @@ in
       );
     };
 
-    schemeName = lib.mkOption {
-      type = lib.types.str;
-    };
-
     themeOverrides = lib.mkOption {
-      type = lib.types.submodule {
+      type = lib.types.nullOr (lib.types.submodule {
         options = {
           spicetify = lib.mkOption {
             type = lib.types.nullOr (
@@ -59,11 +55,8 @@ in
             default = null;
           };
         };
-      };
-      default = {
-        spicetify = null;
-        kitty = null;
-      };
+      });
+      default = null;
     };
 
     font = lib.mkOption {
