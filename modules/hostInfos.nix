@@ -4,6 +4,7 @@ let
     desc:
     lib.mkOption {
       type = lib.types.str;
+      default = "";
       description = desc;
     };
 in
