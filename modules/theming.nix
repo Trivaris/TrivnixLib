@@ -10,6 +10,10 @@ in
 {
   options.themingPrefs = {
     darkmode = lib.mkEnableOption "Enable Dark Mode";
+    schemeName = lib.mkOption {
+      type = lib.types.str;
+      default = "catppuccin-frappe";
+    };
 
     scheme = lib.mkOption {
       type = lib.types.attrsOf (lib.types.strMatching "^#[a-f|A-F|0-9]{6,6}$");
